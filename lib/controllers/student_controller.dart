@@ -53,6 +53,7 @@ class StudentController extends GetxController {
           interests: ['Aviation', 'Flying', 'Navigation'],
           profilePhotoUrl: null,
           enrollmentDate: DateTime(2024, 6, 15),
+          password: 'password123',
         ),
         Student(
           id: 'STU002',
@@ -67,6 +68,7 @@ class StudentController extends GetxController {
           interests: ['Hospitality', 'Travel', 'Customer Service'],
           profilePhotoUrl: null,
           enrollmentDate: DateTime(2024, 7, 20),
+          password: 'password123',
         ),
         Student(
           id: 'STU003',
@@ -81,6 +83,7 @@ class StudentController extends GetxController {
           interests: ['Operations', 'Logistics', 'Technology'],
           profilePhotoUrl: null,
           enrollmentDate: DateTime(2024, 8, 10),
+          password: 'password123',
         ),
         Student(
           id: 'STU004',
@@ -95,6 +98,7 @@ class StudentController extends GetxController {
           interests: ['Aviation', 'Languages', 'Travel'],
           profilePhotoUrl: null,
           enrollmentDate: DateTime(2024, 9, 05),
+          password: 'password123',
         ),
         Student(
           id: 'STU005',
@@ -109,6 +113,7 @@ class StudentController extends GetxController {
           interests: ['Aerospace', 'Engineering', 'Flying'],
           profilePhotoUrl: null,
           enrollmentDate: DateTime(2024, 10, 12),
+          password: 'password123',
         ),
       ];
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../theme/app_theme.dart';
 import '../../../controllers/student_controller.dart';
+import 'student_onboard_edit_card.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class StudentTableCard extends StatelessWidget {
@@ -267,7 +268,7 @@ class StudentTableCard extends StatelessWidget {
                                       vertical: 4,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: AppColors.darkRed.withOpacity(0.1),
+                                      color: AppColors.darkRed.withAlpha(25),
                                       borderRadius: BorderRadius.circular(4),
                                     ),
                                     child: Text(
@@ -294,7 +295,12 @@ class StudentTableCard extends StatelessWidget {
                                 color: AppColors.accentBlue,
                               ),
                               onPressed: () {
-                                // TODO: Open edit dialog
+                                showDialog(
+                                  context: context,
+                                  builder: (context) =>
+                                      StudentOnboardEditCard(student: student),
+                                  barrierDismissible: false,
+                                );
                               },
                             ),
                             IconButton(

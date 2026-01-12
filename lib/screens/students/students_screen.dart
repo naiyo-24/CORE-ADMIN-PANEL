@@ -4,6 +4,7 @@ import '../../theme/app_theme.dart';
 import '../../controllers/student_controller.dart';
 import '../../widgets/side_nav_bar.dart';
 import '../../cards/student/student_table_card.dart';
+import '../../cards/student/student_onboard_edit_card.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class StudentsScreen extends StatefulWidget {
@@ -110,7 +111,7 @@ class _StudentsScreenState extends State<StudentsScreen> {
                                   borderRadius: BorderRadius.circular(8),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: AppColors.darkRed.withOpacity(0.3),
+                                      color: AppColors.darkRed.withAlpha(77),
                                       blurRadius: 12,
                                       offset: const Offset(0, 4),
                                     ),
@@ -118,14 +119,11 @@ class _StudentsScreenState extends State<StudentsScreen> {
                                 ),
                                 child: InkWell(
                                   onTap: () {
-                                    // TODO: Open onboard new student dialog
-                                    Get.snackbar(
-                                      'Coming Soon',
-                                      'Student onboarding feature is under development',
-                                      snackPosition: SnackPosition.BOTTOM,
-                                      backgroundColor: AppColors.warningOrange,
-                                      colorText: AppColors.white,
-                                      duration: const Duration(seconds: 2),
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) =>
+                                          const StudentOnboardEditCard(),
+                                      barrierDismissible: false,
                                     );
                                   },
                                   child: Row(

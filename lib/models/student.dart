@@ -11,6 +11,7 @@ class Student {
   final List<String> interests;
   final String? profilePhotoUrl;
   final DateTime enrollmentDate;
+  final String password;
 
   Student({
     required this.id,
@@ -25,6 +26,7 @@ class Student {
     required this.interests,
     this.profilePhotoUrl,
     required this.enrollmentDate,
+    required this.password,
   });
 
   factory Student.fromJson(Map<String, dynamic> json) {
@@ -41,6 +43,7 @@ class Student {
       interests: List<String>.from(json['interests'] as List),
       profilePhotoUrl: json['profilePhotoUrl'] as String?,
       enrollmentDate: DateTime.parse(json['enrollmentDate'] as String),
+      password: json['password'] as String,
     );
   }
 
@@ -58,6 +61,7 @@ class Student {
       'interests': interests,
       'profilePhotoUrl': profilePhotoUrl,
       'enrollmentDate': enrollmentDate.toIso8601String(),
+      'password': password,
     };
   }
 }
