@@ -186,6 +186,43 @@ class AppTheme {
     );
   }
 
+  // Navigation bar spacing and sizing
+  static double navBarWidth(BuildContext context) {
+    final w = MediaQuery.of(context).size.width;
+    if (w >= AppBreakpoints.tablet) {
+      return _responsive(context, 250, 280, 300);
+    }
+    return 0; // Hidden on mobile
+  }
+
+  static EdgeInsets navBarItemPadding(BuildContext context) {
+    return EdgeInsets.symmetric(
+      horizontal: _responsive(context, 12.0, 16.0, 20.0),
+      vertical: _responsive(context, 10.0, 12.0, 14.0),
+    );
+  }
+
+  static double navBarItemHeight(BuildContext context) {
+    return _responsive(context, 40.0, 48.0, 56.0);
+  }
+
+  static ButtonStyle navBarItemStyle(
+    BuildContext context, {
+    bool isActive = false,
+  }) {
+    return TextButton.styleFrom(
+      padding: navBarItemPadding(context),
+      backgroundColor: isActive
+          ? AppColors.darkRed.withAlpha(25)
+          : Colors.transparent,
+      foregroundColor: isActive ? AppColors.darkRed : AppColors.darkGrayLight,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+      textStyle: textThemeFromContext(context).bodyLarge?.copyWith(
+        fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
+      ),
+    );
+  }
+
   // Light ThemeData (non-responsive core theme)
   static ThemeData themeData() {
     final base = ThemeData.light();

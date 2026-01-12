@@ -80,8 +80,7 @@ class AuthController extends GetxController {
       );
 
       // Navigate to dashboard
-      // TODO: Replace with actual dashboard route when created
-      Get.offAllNamed(AppRoutes.login);
+      Get.offAllNamed(AppRoutes.dashboard);
     } catch (e) {
       Get.snackbar(
         'Error',
