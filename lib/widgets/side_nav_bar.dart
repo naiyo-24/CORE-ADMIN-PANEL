@@ -28,7 +28,7 @@ class SideNavBar extends StatelessWidget {
         'index': 1,
         'label': 'Students',
         'icon': FontAwesomeIcons.graduationCap,
-        'route': '',
+        'route': AppRoutes.students,
       },
       {
         'index': 2,

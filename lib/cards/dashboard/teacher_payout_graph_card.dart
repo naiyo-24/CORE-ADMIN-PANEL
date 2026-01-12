@@ -123,8 +123,8 @@ class TeacherPayoutGraphCard extends StatelessWidget {
                                 begin: Alignment.bottomCenter,
                                 end: Alignment.topCenter,
                                 colors: [
-                                  AppColors.mediumRedLight,
-                                  AppColors.mediumRed,
+                                  AppColors.successGreen,
+                                  AppColors.successGreen.withAlpha(179),
                                 ],
                               ),
                               borderRadius: BorderRadius.circular(4),

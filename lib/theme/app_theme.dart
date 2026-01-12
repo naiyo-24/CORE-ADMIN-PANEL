@@ -42,6 +42,11 @@ class AppTheme {
     return desktop;
   }
 
+  // Check if device is desktop
+  static bool isDesktop(BuildContext context) {
+    return MediaQuery.of(context).size.width >= AppBreakpoints.tablet;
+  }
+
   // Typography sizes (responsive)
   static TextTheme textThemeFromContext(BuildContext context) {
     final h1 = _responsive(context, 22.0, 28.0, 36.0);
