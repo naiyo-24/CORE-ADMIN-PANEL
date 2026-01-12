@@ -28,19 +28,68 @@ class CounselllorPayoutGraphCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Counsellor Commission',
-            style: textTheme.headlineMedium?.copyWith(
-              color: AppColors.darkGray,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Monthly commission paid to counsellors for admissions',
-            style: textTheme.bodySmall?.copyWith(
-              color: AppColors.darkGrayLight,
-            ),
+          // Header with Title and Year Filter
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Counsellor Commission',
+                    style: textTheme.headlineMedium?.copyWith(
+                      color: AppColors.darkGray,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Monthly commission paid to counsellors for admissions',
+                    style: textTheme.bodySmall?.copyWith(
+                      color: AppColors.darkGrayLight,
+                    ),
+                  ),
+                ],
+              ),
+              // Year Selector
+              Obx(
+                () => Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.lightGray,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: AppColors.borderGray, width: 1.5),
+                  ),
+                  child: DropdownButton<int>(
+                    value: dashboardController.selectedYear.value,
+                    items: dashboardController.availableYears
+                        .map(
+                          (year) => DropdownMenuItem(
+                            value: year,
+                            child: Text(
+                              '$year',
+                              style: textTheme.bodyMedium?.copyWith(
+                                color: AppColors.darkGray,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        )
+                        .toList(),
+                    onChanged: (year) {
+                      if (year != null) {
+                        dashboardController.setSelectedYear(year);
+                      }
+                    },
+                    underline: const SizedBox(),
+                    isDense: true,
+                  ),
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 24),
           Obx(() {
@@ -50,20 +99,23 @@ class CounselllorPayoutGraphCard extends StatelessWidget {
               height: 250,
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: List.generate(data.length, (index) {
-                    final monthData = data[index];
-                    final maxAmount = 50000.0;
-                    final barHeight = (monthData.amount / maxAmount) * 200;
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width > 1024
+                      ? MediaQuery.of(context).size.width - 320
+                      : 600,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: List.generate(data.length, (index) {
+                      final monthData = data[index];
+                      final maxAmount = 50000.0;
+                      final barHeight = (monthData.amount / maxAmount) * 200;
 
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                      child: Column(
+                      return Column(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           Container(
-                            width: 24,
+                            width: 28,
                             height: barHeight,
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
@@ -77,7 +129,7 @@ class CounselllorPayoutGraphCard extends StatelessWidget {
                               borderRadius: BorderRadius.circular(4),
                             ),
                           ),
-                          const SizedBox(height: 8),
+                          const SizedBox(height: 12),
                           Text(
                             monthData.month,
                             style: textTheme.bodySmall?.copyWith(
@@ -85,9 +137,9 @@ class CounselllorPayoutGraphCard extends StatelessWidget {
                             ),
                           ),
                         ],
-                      ),
-                    );
-                  }),
+                      );
+                    }),
+                  ),
                 ),
               ),
             );
