@@ -666,11 +666,11 @@ class _StudentOnboardEditCardState extends State<StudentOnboardEditCard> {
 
     if (isEditing) {
       controller.editStudent(widget.student!.id, student).then((_) {
-        Navigator.pop(context);
+        if (mounted) Navigator.pop(context);
       });
     } else {
       controller.addStudent(student).then((_) {
-        Navigator.pop(context);
+        if (mounted) Navigator.pop(context);
       });
     }
   }

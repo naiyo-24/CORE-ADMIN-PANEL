@@ -79,7 +79,7 @@ class TeachersScreen extends StatelessWidget {
                                   Text(
                                     'Manage your teaching staff and their details',
                                     style: textTheme.bodyLarge?.copyWith(
-                                      color: AppColors.white.withOpacity(0.9),
+                                      color: AppColors.white.withAlpha(230),
                                     ),
                                   ),
                                 ],
