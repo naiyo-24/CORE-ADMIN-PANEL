@@ -40,7 +40,7 @@ class SideNavBar extends StatelessWidget {
         'index': 3,
         'label': 'Counsellor Management',
         'icon': FontAwesomeIcons.userTie,
-        'route': '',
+        'route': AppRoutes.counsellors,
       },
       {
         'index': 4,

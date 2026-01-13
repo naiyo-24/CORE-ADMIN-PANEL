@@ -3,11 +3,13 @@ import '../bindings/auth_binding.dart';
 import '../bindings/dashboard_binding.dart';
 import '../bindings/student_binding.dart';
 import '../bindings/teacher_binding.dart';
+import '../bindings/counsellor_binding.dart';
 import '../screens/auth/splash_screen.dart';
 import '../screens/auth/login_screen.dart';
 import '../screens/dashboard/dashboard_page.dart';
 import '../screens/students/students_screen.dart';
 import '../screens/teachers/teachers_screen.dart';
+import '../screens/counsellors/counsellor_screen.dart';
 
 class AppRoutes {
   static const String splash = '/';
@@ -15,6 +17,7 @@ class AppRoutes {
   static const String dashboard = '/dashboard';
   static const String students = '/students';
   static const String teachers = '/teachers';
+  static const String counsellors = '/counsellors';
 
   static List<GetPage> routes = [
     GetPage(
@@ -49,6 +52,13 @@ class AppRoutes {
       name: teachers,
       page: () => const TeachersScreen(),
       binding: TeacherBinding(),
+      transition: Transition.leftToRight,
+      transitionDuration: const Duration(milliseconds: 300),
+    ),
+    GetPage(
+      name: counsellors,
+      page: () => const CounsellorScreen(),
+      binding: CounsellorBinding(),
       transition: Transition.leftToRight,
       transitionDuration: const Duration(milliseconds: 300),
     ),
