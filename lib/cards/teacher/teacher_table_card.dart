@@ -256,7 +256,7 @@ class TeacherTableCard extends StatelessWidget {
                                       vertical: 4,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: AppColors.darkRed.withOpacity(0.1),
+                                      color: AppColors.darkRed.withAlpha(25),
                                       borderRadius: BorderRadius.circular(4),
                                     ),
                                     child: Text(

@@ -17,23 +17,36 @@ class CourseCategory {
 
   factory CourseCategory.fromJson(Map<String, dynamic> json) {
     return CourseCategory(
-      jobRolesOffered: json['jobRolesOffered'] as String,
-      placementAssistance: json['placementAssistance'] as bool,
-      placementType: json['placementType'] as String,
-      placementRate: json['placementRate'] as double,
-      advantagesHighlights: json['advantagesHighlights'] as String,
-      courseFees: json['courseFees'] as double,
+      jobRolesOffered:
+          json['job_roles_offered'] as String? ??
+          json['jobRolesOffered'] as String? ??
+          '',
+      placementAssistance:
+          json['placement_assistance'] as bool? ??
+          json['placementAssistance'] as bool? ??
+          false,
+      placementType:
+          json['placement_type'] as String? ??
+          json['placementType'] as String? ??
+          '',
+      placementRate: (json['placement_rate'] ?? json['placementRate'] ?? 0.0)
+          .toDouble(),
+      advantagesHighlights:
+          json['advantages_highlights'] as String? ??
+          json['advantagesHighlights'] as String? ??
+          '',
+      courseFees: (json['course_fees'] ?? json['courseFees'] ?? 0.0).toDouble(),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'jobRolesOffered': jobRolesOffered,
-      'placementAssistance': placementAssistance,
-      'placementType': placementType,
-      'placementRate': placementRate,
-      'advantagesHighlights': advantagesHighlights,
-      'courseFees': courseFees,
+      'job_roles_offered': jobRolesOffered,
+      'placement_assistance': placementAssistance,
+      'placement_type': placementType,
+      'placement_rate': placementRate,
+      'advantages_highlights': advantagesHighlights,
+      'course_fees': courseFees,
     };
   }
 }
@@ -79,48 +92,105 @@ class Course {
 
   factory Course.fromJson(Map<String, dynamic> json) {
     return Course(
-      id: json['id'] as String,
-      name: json['name'] as String,
-      description: json['description'] as String,
-      code: json['code'] as String,
-      weightRequirements: json['weightRequirements'] as String,
-      heightRequirements: json['heightRequirements'] as String,
-      visionStandards: json['visionStandards'] as String,
-      medicalRequirements: json['medicalRequirements'] as String,
+      id: json['course_id'] as String? ?? json['id'] as String? ?? '',
+      name: json['course_name'] as String? ?? json['name'] as String? ?? '',
+      description:
+          json['course_description'] as String? ??
+          json['description'] as String? ??
+          '',
+      code: json['course_code'] as String? ?? json['code'] as String? ?? '',
+      weightRequirements:
+          json['weight_requirements'] as String? ??
+          json['weightRequirements'] as String? ??
+          '',
+      heightRequirements:
+          json['height_requirements'] as String? ??
+          json['heightRequirements'] as String? ??
+          '',
+      visionStandards:
+          json['vision_standards'] as String? ??
+          json['visionStandards'] as String? ??
+          '',
+      medicalRequirements:
+          json['medical_requirements'] as String? ??
+          json['medicalRequirements'] as String? ??
+          '',
       minEducationalQualification:
-          json['minEducationalQualification'] as String,
-      ageCriteria: json['ageCriteria'] as String,
-      internshipIncluded: json['internshipIncluded'] as bool,
-      installmentAvailable: json['installmentAvailable'] as bool,
-      installmentPolicy: json['installmentPolicy'] as String,
-      photoUrl: json['photoUrl'] as String?,
-      videoUrl: json['videoUrl'] as String?,
-      generalCategory: CourseCategory.fromJson(
-        json['generalCategory'] as Map<String, dynamic>,
-      ),
-      executiveCategory: CourseCategory.fromJson(
-        json['executiveCategory'] as Map<String, dynamic>,
-      ),
+          json['min_educational_qualification'] as String? ??
+          json['minEducationalQualification'] as String? ??
+          '',
+      ageCriteria:
+          json['age_criteria'] as String? ??
+          json['ageCriteria'] as String? ??
+          '',
+      internshipIncluded:
+          json['internship_included'] as bool? ??
+          json['internshipIncluded'] as bool? ??
+          false,
+      installmentAvailable:
+          json['installment_available'] as bool? ??
+          json['installmentAvailable'] as bool? ??
+          false,
+      installmentPolicy:
+          json['installment_policy'] as String? ??
+          json['installmentPolicy'] as String? ??
+          '',
+      photoUrl: json['course_photo'] as String? ?? json['photoUrl'] as String?,
+      videoUrl: json['course_video'] as String? ?? json['videoUrl'] as String?,
+      generalCategory: json['generalCategory'] != null
+          ? CourseCategory.fromJson(
+              json['generalCategory'] as Map<String, dynamic>,
+            )
+          : json['category_data'] != null &&
+                json['course_category'] == 'general'
+          ? CourseCategory.fromJson(
+              json['category_data'] as Map<String, dynamic>,
+            )
+          : CourseCategory(
+              jobRolesOffered: '',
+              placementAssistance: false,
+              placementType: '',
+              placementRate: 0.0,
+              advantagesHighlights: '',
+              courseFees: 0.0,
+            ),
+      executiveCategory: json['executiveCategory'] != null
+          ? CourseCategory.fromJson(
+              json['executiveCategory'] as Map<String, dynamic>,
+            )
+          : json['category_data'] != null &&
+                json['course_category'] == 'executive'
+          ? CourseCategory.fromJson(
+              json['category_data'] as Map<String, dynamic>,
+            )
+          : CourseCategory(
+              jobRolesOffered: '',
+              placementAssistance: false,
+              placementType: '',
+              placementRate: 0.0,
+              advantagesHighlights: '',
+              courseFees: 0.0,
+            ),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
-      'name': name,
-      'description': description,
-      'code': code,
-      'weightRequirements': weightRequirements,
-      'heightRequirements': heightRequirements,
-      'visionStandards': visionStandards,
-      'medicalRequirements': medicalRequirements,
-      'minEducationalQualification': minEducationalQualification,
-      'ageCriteria': ageCriteria,
-      'internshipIncluded': internshipIncluded,
-      'installmentAvailable': installmentAvailable,
-      'installmentPolicy': installmentPolicy,
-      'photoUrl': photoUrl,
-      'videoUrl': videoUrl,
+      'course_id': id,
+      'course_name': name,
+      'course_description': description,
+      'course_code': code,
+      'weight_requirements': weightRequirements,
+      'height_requirements': heightRequirements,
+      'vision_standards': visionStandards,
+      'medical_requirements': medicalRequirements,
+      'min_educational_qualification': minEducationalQualification,
+      'age_criteria': ageCriteria,
+      'internship_included': internshipIncluded,
+      'installment_available': installmentAvailable,
+      'installment_policy': installmentPolicy,
+      'course_photo': photoUrl,
+      'course_video': videoUrl,
       'generalCategory': generalCategory.toJson(),
       'executiveCategory': executiveCategory.toJson(),
     };

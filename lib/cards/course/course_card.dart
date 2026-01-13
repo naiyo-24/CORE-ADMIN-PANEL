@@ -252,7 +252,7 @@ class _CourseCardState extends State<CourseCard> {
                 onPressed: () {
                   _showDeleteConfirmation(
                     context,
-                    widget.course.id,
+                    widget.course.code,
                     widget.course.name,
                   );
                 },
@@ -336,7 +336,7 @@ class _CourseCardState extends State<CourseCard> {
 
   void _showDeleteConfirmation(
     BuildContext context,
-    String courseId,
+    String courseCode,
     String courseName,
   ) {
     showDialog(
@@ -353,7 +353,7 @@ class _CourseCardState extends State<CourseCard> {
             ),
             TextButton(
               onPressed: () {
-                controller.deleteCourse(courseId);
+                controller.deleteCourse(courseCode);
                 Navigator.pop(context);
               },
               child: const Text(

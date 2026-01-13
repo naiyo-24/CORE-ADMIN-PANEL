@@ -79,7 +79,7 @@ class CourseScreen extends StatelessWidget {
                                   Text(
                                     'Manage aviation courses and their details',
                                     style: textTheme.bodyLarge?.copyWith(
-                                      color: AppColors.white.withOpacity(0.9),
+                                      color: AppColors.white.withAlpha(230),
                                     ),
                                   ),
                                 ],

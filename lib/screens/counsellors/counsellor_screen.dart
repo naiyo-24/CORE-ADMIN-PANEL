@@ -79,7 +79,7 @@ class CounsellorScreen extends StatelessWidget {
                                   Text(
                                     'Manage your counselling team and their profiles',
                                     style: textTheme.bodyLarge?.copyWith(
-                                      color: AppColors.white.withOpacity(0.9),
+                                      color: AppColors.white.withAlpha(230),
                                     ),
                                   ),
                                 ],

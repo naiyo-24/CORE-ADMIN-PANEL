@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:get/get.dart';
@@ -32,14 +33,12 @@ class _EditCreateCourseCardState extends State<EditCreateCourseCard> {
 
   // General Category Controllers
   late final TextEditingController _generalJobRolesController;
-  late final TextEditingController _generalPlacementTypeController;
   late final TextEditingController _generalPlacementRateController;
   late final TextEditingController _generalAdvantagesController;
   late final TextEditingController _generalFeesController;
 
   // Executive Category Controllers
   late final TextEditingController _executiveJobRolesController;
-  late final TextEditingController _executivePlacementTypeController;
   late final TextEditingController _executivePlacementRateController;
   late final TextEditingController _executiveAdvantagesController;
   late final TextEditingController _executiveFeesController;
@@ -48,8 +47,12 @@ class _EditCreateCourseCardState extends State<EditCreateCourseCard> {
   bool _installmentAvailable = false;
   bool _generalPlacementAssistance = false;
   bool _executivePlacementAssistance = false;
+  String _generalPlacementType = 'Assisted';
+  String _executivePlacementType = 'Assisted';
   String? _photoUrl;
   String? _photoDisplayName;
+  File? _photoFile;
+  File? _videoFile;
 
   @override
   void initState() {
@@ -84,9 +87,6 @@ class _EditCreateCourseCardState extends State<EditCreateCourseCard> {
     _generalJobRolesController = TextEditingController(
       text: widget.course?.generalCategory.jobRolesOffered ?? '',
     );
-    _generalPlacementTypeController = TextEditingController(
-      text: widget.course?.generalCategory.placementType ?? '',
-    );
     _generalPlacementRateController = TextEditingController(
       text: widget.course?.generalCategory.placementRate.toString() ?? '',
     );
@@ -99,9 +99,6 @@ class _EditCreateCourseCardState extends State<EditCreateCourseCard> {
 
     _executiveJobRolesController = TextEditingController(
       text: widget.course?.executiveCategory.jobRolesOffered ?? '',
-    );
-    _executivePlacementTypeController = TextEditingController(
-      text: widget.course?.executiveCategory.placementType ?? '',
     );
     _executivePlacementRateController = TextEditingController(
       text: widget.course?.executiveCategory.placementRate.toString() ?? '',
@@ -119,6 +116,10 @@ class _EditCreateCourseCardState extends State<EditCreateCourseCard> {
         widget.course?.generalCategory.placementAssistance ?? false;
     _executivePlacementAssistance =
         widget.course?.executiveCategory.placementAssistance ?? false;
+    _generalPlacementType =
+        widget.course?.generalCategory.placementType ?? 'Assisted';
+    _executivePlacementType =
+        widget.course?.executiveCategory.placementType ?? 'Assisted';
     _photoUrl = widget.course?.photoUrl;
     _photoDisplayName = widget.course?.photoUrl != null
         ? 'Current Photo'
@@ -138,12 +139,10 @@ class _EditCreateCourseCardState extends State<EditCreateCourseCard> {
     _ageController.dispose();
     _installmentPolicyController.dispose();
     _generalJobRolesController.dispose();
-    _generalPlacementTypeController.dispose();
     _generalPlacementRateController.dispose();
     _generalAdvantagesController.dispose();
     _generalFeesController.dispose();
     _executiveJobRolesController.dispose();
-    _executivePlacementTypeController.dispose();
     _executivePlacementRateController.dispose();
     _executiveAdvantagesController.dispose();
     _executiveFeesController.dispose();
@@ -159,12 +158,12 @@ class _EditCreateCourseCardState extends State<EditCreateCourseCard> {
 
       if (result != null) {
         setState(() {
-          if (kIsWeb) {
-            _photoUrl = result.files.single.name;
-            _photoDisplayName = result.files.single.name;
-          } else {
+          _photoDisplayName = result.files.single.name;
+          if (!kIsWeb && result.files.single.path != null) {
+            _photoFile = File(result.files.single.path!);
             _photoUrl = result.files.single.path;
-            _photoDisplayName = result.files.single.name;
+          } else {
+            _photoUrl = result.files.single.name;
           }
         });
       }
@@ -199,7 +198,7 @@ class _EditCreateCourseCardState extends State<EditCreateCourseCard> {
         generalCategory: CourseCategory(
           jobRolesOffered: _generalJobRolesController.text.trim(),
           placementAssistance: _generalPlacementAssistance,
-          placementType: _generalPlacementTypeController.text.trim(),
+          placementType: _generalPlacementType,
           placementRate:
               double.tryParse(_generalPlacementRateController.text.trim()) ?? 0,
           advantagesHighlights: _generalAdvantagesController.text.trim(),
@@ -208,7 +207,7 @@ class _EditCreateCourseCardState extends State<EditCreateCourseCard> {
         executiveCategory: CourseCategory(
           jobRolesOffered: _executiveJobRolesController.text.trim(),
           placementAssistance: _executivePlacementAssistance,
-          placementType: _executivePlacementTypeController.text.trim(),
+          placementType: _executivePlacementType,
           placementRate:
               double.tryParse(_executivePlacementRateController.text.trim()) ??
               0,
@@ -219,9 +218,18 @@ class _EditCreateCourseCardState extends State<EditCreateCourseCard> {
       );
 
       if (widget.course == null) {
-        courseController.addCourse(course);
+        courseController.addCourse(
+          course,
+          photoFile: _photoFile,
+          videoFile: _videoFile,
+        );
       } else {
-        courseController.editCourse(widget.course!.id, course);
+        courseController.editCourse(
+          widget.course!.id,
+          course,
+          photoFile: _photoFile,
+          videoFile: _videoFile,
+        );
       }
 
       Navigator.pop(context);
@@ -383,7 +391,8 @@ class _EditCreateCourseCardState extends State<EditCreateCourseCard> {
                       _buildCategorySection(
                         'General Category',
                         _generalJobRolesController,
-                        _generalPlacementTypeController,
+                        _generalPlacementType,
+                        (val) => setState(() => _generalPlacementType = val!),
                         _generalPlacementRateController,
                         _generalAdvantagesController,
                         _generalFeesController,
@@ -399,7 +408,8 @@ class _EditCreateCourseCardState extends State<EditCreateCourseCard> {
                       _buildCategorySection(
                         'Executive Category',
                         _executiveJobRolesController,
-                        _executivePlacementTypeController,
+                        _executivePlacementType,
+                        (val) => setState(() => _executivePlacementType = val!),
                         _executivePlacementRateController,
                         _executiveAdvantagesController,
                         _executiveFeesController,
@@ -540,7 +550,8 @@ class _EditCreateCourseCardState extends State<EditCreateCourseCard> {
   Widget _buildCategorySection(
     String title,
     TextEditingController jobRolesController,
-    TextEditingController placementTypeController,
+    String placementType,
+    Function(String?) onPlacementTypeChanged,
     TextEditingController placementRateController,
     TextEditingController advantagesController,
     TextEditingController feesController,
@@ -558,7 +569,25 @@ class _EditCreateCourseCardState extends State<EditCreateCourseCard> {
         const SizedBox(height: 12),
         _buildTwoColumnLayout(
           isDesktop,
-          _buildTextField(placementTypeController, 'Placement Type *'),
+          DropdownButtonFormField<String>(
+            value: placementType,
+            decoration: InputDecoration(
+              labelText: 'Placement Type *',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: AppColors.darkRed, width: 2),
+              ),
+            ),
+            items: const [
+              DropdownMenuItem(value: 'Assisted', child: Text('Assisted')),
+              DropdownMenuItem(value: 'Guaranteed', child: Text('Guaranteed')),
+            ],
+            onChanged: onPlacementTypeChanged,
+            validator: (val) => val == null ? 'Required' : null,
+          ),
           _buildTextField(
             placementRateController,
             'Placement Rate (%) *',
