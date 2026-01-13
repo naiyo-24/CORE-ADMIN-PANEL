@@ -6,22 +6,31 @@ import '../../models/course.dart';
 import 'edit_create_course_card.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-class CourseCard extends StatelessWidget {
+class CourseCard extends StatefulWidget {
   final Course course;
-  final CourseCategory category;
-  final String categoryType; // 'General' or 'Executive'
 
-  const CourseCard({
-    super.key,
-    required this.course,
-    required this.category,
-    required this.categoryType,
-  });
+  const CourseCard({super.key, required this.course});
+
+  @override
+  State<CourseCard> createState() => _CourseCardState();
+}
+
+class _CourseCardState extends State<CourseCard> {
+  late String _selectedCategory; // 'General' or 'Executive'
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedCategory = 'General';
+  }
 
   @override
   Widget build(BuildContext context) {
     final textTheme = AppTheme.textThemeFromContext(context);
     final isDesktop = AppTheme.isDesktop(context);
+    final category = _selectedCategory == 'General'
+        ? widget.course.generalCategory
+        : widget.course.executiveCategory;
 
     return Container(
       decoration: BoxDecoration(
@@ -40,7 +49,7 @@ class CourseCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header with title and category badge
+          // Header with title and category toggle
           Row(
             children: [
               Expanded(
@@ -48,7 +57,7 @@ class CourseCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      course.name,
+                      widget.course.name,
                       style: textTheme.headlineSmall?.copyWith(
                         color: AppColors.darkGray,
                         fontWeight: FontWeight.w700,
@@ -56,7 +65,7 @@ class CourseCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Code: ${course.code}',
+                      'Code: ${widget.course.code}',
                       style: textTheme.bodySmall?.copyWith(
                         color: AppColors.darkGrayLight,
                       ),
@@ -64,31 +73,28 @@ class CourseCard extends StatelessWidget {
                   ],
                 ),
               ),
+              // Category Toggle Button
               Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
                 decoration: BoxDecoration(
-                  color: categoryType == 'General'
-                      ? AppColors.successGreen.withAlpha(25)
-                      : AppColors.accentBlue.withAlpha(25),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: categoryType == 'General'
-                        ? AppColors.successGreen
-                        : AppColors.accentBlue,
-                    width: 1.5,
-                  ),
+                  border: Border.all(color: AppColors.borderGray, width: 1.5),
+                  borderRadius: BorderRadius.circular(8),
                 ),
-                child: Text(
-                  categoryType,
-                  style: textTheme.bodySmall?.copyWith(
-                    color: categoryType == 'General'
-                        ? AppColors.successGreen
-                        : AppColors.accentBlue,
-                    fontWeight: FontWeight.w700,
-                  ),
+                padding: const EdgeInsets.all(4),
+                child: Row(
+                  children: [
+                    _buildCategoryToggleButton(
+                      'General',
+                      _selectedCategory == 'General',
+                      () => setState(() => _selectedCategory = 'General'),
+                      AppColors.successGreen,
+                    ),
+                    _buildCategoryToggleButton(
+                      'Executive',
+                      _selectedCategory == 'Executive',
+                      () => setState(() => _selectedCategory = 'Executive'),
+                      AppColors.accentBlue,
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -97,7 +103,7 @@ class CourseCard extends StatelessWidget {
 
           // Description
           Text(
-            course.description,
+            widget.course.description,
             style: textTheme.bodyMedium?.copyWith(
               color: AppColors.darkGrayLight,
             ),
@@ -225,7 +231,8 @@ class CourseCard extends StatelessWidget {
                 onPressed: () {
                   showDialog(
                     context: context,
-                    builder: (context) => EditCreateCourseCard(course: course),
+                    builder: (context) =>
+                        EditCreateCourseCard(course: widget.course),
                     barrierDismissible: false,
                   );
                 },
@@ -243,7 +250,11 @@ class CourseCard extends StatelessWidget {
               const SizedBox(width: 12),
               ElevatedButton.icon(
                 onPressed: () {
-                  _showDeleteConfirmation(context, course.id, course.name);
+                  _showDeleteConfirmation(
+                    context,
+                    widget.course.id,
+                    widget.course.name,
+                  );
                 },
                 icon: const Icon(FontAwesomeIcons.trash, size: 14),
                 label: const Text('Delete'),
@@ -290,6 +301,36 @@ class CourseCard extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
         ),
       ],
+    );
+  }
+
+  Widget _buildCategoryToggleButton(
+    String label,
+    bool isSelected,
+    VoidCallback onPressed,
+    Color color,
+  ) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onPressed,
+        borderRadius: BorderRadius.circular(6),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            color: isSelected ? color.withAlpha(25) : Colors.transparent,
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: Text(
+            label,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+              color: isSelected ? color : AppColors.darkGrayLight,
+            ),
+          ),
+        ),
+      ),
     );
   }
 

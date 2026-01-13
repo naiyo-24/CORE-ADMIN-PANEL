@@ -232,25 +232,12 @@ class CourseScreen extends StatelessWidget {
                         return ListView.separated(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
-                          itemCount: courses.length * 2,
-                          separatorBuilder: (context, index) {
-                            if (index.isEven) {
-                              return const SizedBox(height: 12);
-                            }
-                            return const SizedBox(height: 0);
-                          },
+                          itemCount: courses.length,
+                          separatorBuilder: (context, index) =>
+                              const SizedBox(height: 12),
                           itemBuilder: (context, index) {
-                            final courseIndex = index ~/ 2;
-                            final course = courses[courseIndex];
-                            final isGeneral = index.isEven;
-
-                            return CourseCard(
-                              course: course,
-                              category: isGeneral
-                                  ? course.generalCategory
-                                  : course.executiveCategory,
-                              categoryType: isGeneral ? 'General' : 'Executive',
-                            );
+                            final course = courses[index];
+                            return CourseCard(course: course);
                           },
                         );
                       }),
