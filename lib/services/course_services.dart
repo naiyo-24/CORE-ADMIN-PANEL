@@ -302,27 +302,27 @@ class CourseServices {
     String? videoName,
   }) async {
     try {
-      // Get existing course records to find their IDs
-      final allCourses = await _dio.get(ApiUrl.getAllCourses);
-      final coursesData = allCourses.data as List<dynamic>;
+      // Get all course records for this code
+      final allCoursesResp = await _dio.get(ApiUrl.getAllCourses);
+      final coursesData = allCoursesResp.data as List<dynamic>;
 
-      String? generalId;
-      String? executiveId;
-
+      // Find both general and executive records for this course code
+      Map<String, dynamic>? generalData;
+      Map<String, dynamic>? executiveData;
       for (var courseData in coursesData) {
         if (courseData['course_code'] == course.code) {
           if (courseData['course_category'] == 'general') {
-            generalId = courseData['course_id'];
+            generalData = courseData as Map<String, dynamic>;
           } else if (courseData['course_category'] == 'executive') {
-            executiveId = courseData['course_id'];
+            executiveData = courseData as Map<String, dynamic>;
           }
         }
       }
 
-      // Update general category if exists
-      if (generalId != null) {
+      // Update general record if exists
+      if (generalData != null) {
         await _updateCourseRecord(
-          generalId,
+          generalData['course_id'],
           course,
           'general',
           course.generalCategory,
@@ -335,10 +335,38 @@ class CourseServices {
         );
       }
 
-      // Update executive category if exists
-      if (executiveId != null) {
+      // Update executive record if exists
+      if (executiveData != null) {
         await _updateCourseRecord(
-          executiveId,
+          executiveData['course_id'],
+          course,
+          'executive',
+          course.executiveCategory,
+          photoFile,
+          videoFile,
+          photoBytes,
+          photoName,
+          videoBytes,
+          videoName,
+        );
+      }
+
+      // If a record is missing, create it
+      if (generalData == null) {
+        await _createCourseRecord(
+          course,
+          'general',
+          course.generalCategory,
+          photoFile,
+          videoFile,
+          photoBytes,
+          photoName,
+          videoBytes,
+          videoName,
+        );
+      }
+      if (executiveData == null) {
+        await _createCourseRecord(
           course,
           'executive',
           course.executiveCategory,
