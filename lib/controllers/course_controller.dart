@@ -68,8 +68,7 @@ class CourseController extends GetxController {
   }) async {
     try {
       isCreating.value = true;
-
-      // Create course via API
+      // Add course via API (new structure)
       await CourseServices.createCourse(
         course,
         photoFile: photoFile,
@@ -79,10 +78,7 @@ class CourseController extends GetxController {
         videoBytes: videoBytes,
         videoName: videoName,
       );
-
-      // Refresh courses list
       await getAllCourses();
-
       Get.snackbar(
         'Success',
         'Course added successfully!',
@@ -115,8 +111,7 @@ class CourseController extends GetxController {
   }) async {
     try {
       isCreating.value = true;
-
-      // Update course via API
+      // Update course via API (new structure)
       await CourseServices.updateCourse(
         courseId,
         updatedCourse,
@@ -127,10 +122,7 @@ class CourseController extends GetxController {
         videoBytes: videoBytes,
         videoName: videoName,
       );
-
-      // Refresh courses list
       await getAllCourses();
-
       Get.snackbar(
         'Success',
         'Course updated successfully!',
@@ -153,13 +145,10 @@ class CourseController extends GetxController {
 
   Future<void> deleteCourse(String courseCode) async {
     try {
-      // Delete course via API (deletes both general and executive records)
+      // Delete course via API (single row, both categories)
       await CourseServices.deleteCourse(courseCode);
-
-      // Remove from local list
       courses.removeWhere((c) => c.code == courseCode);
       filteredCourses.value = List.from(courses);
-
       Get.snackbar(
         'Success',
         'Course deleted successfully!',

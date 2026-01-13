@@ -17,25 +17,12 @@ class CourseCategory {
 
   factory CourseCategory.fromJson(Map<String, dynamic> json) {
     return CourseCategory(
-      jobRolesOffered:
-          json['job_roles_offered'] as String? ??
-          json['jobRolesOffered'] as String? ??
-          '',
-      placementAssistance:
-          json['placement_assistance'] as bool? ??
-          json['placementAssistance'] as bool? ??
-          false,
-      placementType:
-          json['placement_type'] as String? ??
-          json['placementType'] as String? ??
-          '',
-      placementRate: (json['placement_rate'] ?? json['placementRate'] ?? 0.0)
-          .toDouble(),
-      advantagesHighlights:
-          json['advantages_highlights'] as String? ??
-          json['advantagesHighlights'] as String? ??
-          '',
-      courseFees: (json['course_fees'] ?? json['courseFees'] ?? 0.0).toDouble(),
+      jobRolesOffered: json['job_roles_offered'] as String? ?? '',
+      placementAssistance: json['placement_assistance'] as bool? ?? false,
+      placementType: json['placement_type'] as String? ?? '',
+      placementRate: (json['placement_rate'] ?? 0.0).toDouble(),
+      advantagesHighlights: json['advantages_highlights'] as String? ?? '',
+      courseFees: (json['course_fees'] ?? 0.0).toDouble(),
     );
   }
 
@@ -48,6 +35,17 @@ class CourseCategory {
       'advantages_highlights': advantagesHighlights,
       'course_fees': courseFees,
     };
+  }
+
+  factory CourseCategory.empty() {
+    return CourseCategory(
+      jobRolesOffered: '',
+      placementAssistance: false,
+      placementType: '',
+      placementRate: 0.0,
+      advantagesHighlights: '',
+      courseFees: 0.0,
+    );
   }
 }
 
@@ -92,85 +90,28 @@ class Course {
 
   factory Course.fromJson(Map<String, dynamic> json) {
     return Course(
-      id: json['course_id'] as String? ?? json['id'] as String? ?? '',
-      name: json['course_name'] as String? ?? json['name'] as String? ?? '',
-      description:
-          json['course_description'] as String? ??
-          json['description'] as String? ??
-          '',
-      code: json['course_code'] as String? ?? json['code'] as String? ?? '',
-      weightRequirements:
-          json['weight_requirements'] as String? ??
-          json['weightRequirements'] as String? ??
-          '',
-      heightRequirements:
-          json['height_requirements'] as String? ??
-          json['heightRequirements'] as String? ??
-          '',
-      visionStandards:
-          json['vision_standards'] as String? ??
-          json['visionStandards'] as String? ??
-          '',
-      medicalRequirements:
-          json['medical_requirements'] as String? ??
-          json['medicalRequirements'] as String? ??
-          '',
+      id: json['course_id'] as String? ?? '',
+      name: json['course_name'] as String? ?? '',
+      description: json['course_description'] as String? ?? '',
+      code: json['course_code'] as String? ?? '',
+      weightRequirements: json['weight_requirements'] as String? ?? '',
+      heightRequirements: json['height_requirements'] as String? ?? '',
+      visionStandards: json['vision_standards'] as String? ?? '',
+      medicalRequirements: json['medical_requirements'] as String? ?? '',
       minEducationalQualification:
-          json['min_educational_qualification'] as String? ??
-          json['minEducationalQualification'] as String? ??
-          '',
-      ageCriteria:
-          json['age_criteria'] as String? ??
-          json['ageCriteria'] as String? ??
-          '',
-      internshipIncluded:
-          json['internship_included'] as bool? ??
-          json['internshipIncluded'] as bool? ??
-          false,
-      installmentAvailable:
-          json['installment_available'] as bool? ??
-          json['installmentAvailable'] as bool? ??
-          false,
-      installmentPolicy:
-          json['installment_policy'] as String? ??
-          json['installmentPolicy'] as String? ??
-          '',
-      photoUrl: json['course_photo'] as String? ?? json['photoUrl'] as String?,
-      videoUrl: json['course_video'] as String? ?? json['videoUrl'] as String?,
-      generalCategory: json['generalCategory'] != null
-          ? CourseCategory.fromJson(
-              json['generalCategory'] as Map<String, dynamic>,
-            )
-          : json['category_data'] != null &&
-                json['course_category'] == 'general'
-          ? CourseCategory.fromJson(
-              json['category_data'] as Map<String, dynamic>,
-            )
-          : CourseCategory(
-              jobRolesOffered: '',
-              placementAssistance: false,
-              placementType: '',
-              placementRate: 0.0,
-              advantagesHighlights: '',
-              courseFees: 0.0,
-            ),
-      executiveCategory: json['executiveCategory'] != null
-          ? CourseCategory.fromJson(
-              json['executiveCategory'] as Map<String, dynamic>,
-            )
-          : json['category_data'] != null &&
-                json['course_category'] == 'executive'
-          ? CourseCategory.fromJson(
-              json['category_data'] as Map<String, dynamic>,
-            )
-          : CourseCategory(
-              jobRolesOffered: '',
-              placementAssistance: false,
-              placementType: '',
-              placementRate: 0.0,
-              advantagesHighlights: '',
-              courseFees: 0.0,
-            ),
+          json['min_educational_qualification'] as String? ?? '',
+      ageCriteria: json['age_criteria'] as String? ?? '',
+      internshipIncluded: json['internship_included'] as bool? ?? false,
+      installmentAvailable: json['installment_available'] as bool? ?? false,
+      installmentPolicy: json['installment_policy'] as String? ?? '',
+      photoUrl: json['course_photo'] as String?,
+      videoUrl: json['course_video'] as String?,
+      generalCategory: json['general_data'] != null
+          ? CourseCategory.fromJson(json['general_data'])
+          : CourseCategory.empty(),
+      executiveCategory: json['executive_data'] != null
+          ? CourseCategory.fromJson(json['executive_data'])
+          : CourseCategory.empty(),
     );
   }
 
@@ -191,8 +132,8 @@ class Course {
       'installment_policy': installmentPolicy,
       'course_photo': photoUrl,
       'course_video': videoUrl,
-      'generalCategory': generalCategory.toJson(),
-      'executiveCategory': executiveCategory.toJson(),
+      'general_data': generalCategory.toJson(),
+      'executive_data': executiveCategory.toJson(),
     };
   }
 }
