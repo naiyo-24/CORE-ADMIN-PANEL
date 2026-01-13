@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../models/admin.dart';
 import '../routes/app_routes.dart';
+import '../services/auth_services.dart';
 
 class AuthController extends GetxController {
   // Form controllers
@@ -39,7 +40,6 @@ class AuthController extends GetxController {
       );
       return;
     }
-
     if (passwordController.text.isEmpty) {
       Get.snackbar(
         'Error',
@@ -51,40 +51,26 @@ class AuthController extends GetxController {
       );
       return;
     }
-
     isLoading.value = true;
-
     try {
-      // Simulate API call
-      await Future.delayed(const Duration(seconds: 2));
-
-      // TODO: Replace with actual API call
-      // For now, accept any email/password for demo
-      final admin = Admin(
-        id: '1',
+      final admin = await AuthServices.login(
         email: emailController.text.trim(),
-        name: 'Admin User',
-        role: 'Super Admin',
-        createdAt: DateTime.now(),
+        password: passwordController.text,
       );
-
       currentAdmin.value = admin;
-
       Get.snackbar(
         'Success',
-        'Welcome back, ${admin.name}!',
+        'Welcome back, ${admin.name.isNotEmpty ? admin.name : admin.email}!',
         backgroundColor: const Color(0xFF4CAF50),
         colorText: const Color(0xFFFEFEFE),
         snackPosition: SnackPosition.TOP,
         margin: const EdgeInsets.all(16),
       );
-
-      // Navigate to dashboard
       Get.offAllNamed(AppRoutes.dashboard);
     } catch (e) {
       Get.snackbar(
         'Error',
-        'Login failed. Please try again.',
+        e.toString().replaceAll('Exception: ', ''),
         backgroundColor: const Color(0xFFE53935),
         colorText: const Color(0xFFFEFEFE),
         snackPosition: SnackPosition.TOP,

@@ -2,6 +2,9 @@ class ApiUrl {
   // Base URL
   static const String baseUrl = 'http://localhost:8000';
 
+  // Admin Auth endpoints
+  static const String adminLogin = '/api/admin/login';
+
   // Course endpoints
   static const String coursesBase = '/api/courses';
   static const String createCourse = '/api/courses/create';

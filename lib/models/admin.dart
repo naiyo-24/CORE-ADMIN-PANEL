@@ -17,9 +17,11 @@ class Admin {
     return Admin(
       id: json['id'] as String,
       email: json['email'] as String,
-      name: json['name'] as String,
-      role: json['role'] as String,
-      createdAt: DateTime.parse(json['createdAt'] as String),
+      name: json['name'] as String? ?? '',
+      role: json['role'] as String? ?? '',
+      createdAt: DateTime.parse(
+        json['created_at'] as String? ?? json['createdAt'] as String,
+      ),
     );
   }
 
