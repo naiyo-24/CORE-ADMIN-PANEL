@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../models/course.dart';
@@ -60,6 +61,10 @@ class CourseController extends GetxController {
     Course course, {
     File? photoFile,
     File? videoFile,
+    Uint8List? photoBytes,
+    String? photoName,
+    Uint8List? videoBytes,
+    String? videoName,
   }) async {
     try {
       isCreating.value = true;
@@ -69,6 +74,10 @@ class CourseController extends GetxController {
         course,
         photoFile: photoFile,
         videoFile: videoFile,
+        photoBytes: photoBytes,
+        photoName: photoName,
+        videoBytes: videoBytes,
+        videoName: videoName,
       );
 
       // Refresh courses list
@@ -99,6 +108,10 @@ class CourseController extends GetxController {
     Course updatedCourse, {
     File? photoFile,
     File? videoFile,
+    Uint8List? photoBytes,
+    String? photoName,
+    Uint8List? videoBytes,
+    String? videoName,
   }) async {
     try {
       isCreating.value = true;
@@ -109,6 +122,10 @@ class CourseController extends GetxController {
         updatedCourse,
         photoFile: photoFile,
         videoFile: videoFile,
+        photoBytes: photoBytes,
+        photoName: photoName,
+        videoBytes: videoBytes,
+        videoName: videoName,
       );
 
       // Refresh courses list

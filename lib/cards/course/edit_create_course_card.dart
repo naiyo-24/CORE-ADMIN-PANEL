@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:get/get.dart';
@@ -55,6 +56,10 @@ class _EditCreateCourseCardState extends State<EditCreateCourseCard> {
   File? _videoFile;
   String? _videoUrl;
   String? _videoDisplayName;
+  Uint8List? _photoBytes;
+  String? _photoFileName;
+  Uint8List? _videoBytes;
+  String? _videoFileName;
 
   @override
   void initState() {
@@ -167,11 +172,13 @@ class _EditCreateCourseCardState extends State<EditCreateCourseCard> {
       if (result != null) {
         setState(() {
           _photoDisplayName = result.files.single.name;
+          _photoFileName = result.files.single.name;
           if (!kIsWeb && result.files.single.path != null) {
             _photoFile = File(result.files.single.path!);
             _photoUrl = result.files.single.path;
           } else {
             _photoUrl = result.files.single.name;
+            _photoBytes = result.files.single.bytes;
           }
         });
       }
@@ -195,11 +202,13 @@ class _EditCreateCourseCardState extends State<EditCreateCourseCard> {
       if (result != null) {
         setState(() {
           _videoDisplayName = result.files.single.name;
+          _videoFileName = result.files.single.name;
           if (!kIsWeb && result.files.single.path != null) {
             _videoFile = File(result.files.single.path!);
             _videoUrl = result.files.single.path;
           } else {
             _videoUrl = result.files.single.name;
+            _videoBytes = result.files.single.bytes;
           }
         });
       }
@@ -258,6 +267,10 @@ class _EditCreateCourseCardState extends State<EditCreateCourseCard> {
           course,
           photoFile: _photoFile,
           videoFile: _videoFile,
+          photoBytes: _photoBytes,
+          photoName: _photoFileName,
+          videoBytes: _videoBytes,
+          videoName: _videoFileName,
         );
       } else {
         courseController.editCourse(
@@ -265,6 +278,10 @@ class _EditCreateCourseCardState extends State<EditCreateCourseCard> {
           course,
           photoFile: _photoFile,
           videoFile: _videoFile,
+          photoBytes: _photoBytes,
+          photoName: _photoFileName,
+          videoBytes: _videoBytes,
+          videoName: _videoFileName,
         );
       }
 

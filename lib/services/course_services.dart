@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import '../models/course.dart';
@@ -164,6 +165,10 @@ class CourseServices {
     Course course, {
     File? photoFile,
     File? videoFile,
+    Uint8List? photoBytes,
+    String? photoName,
+    Uint8List? videoBytes,
+    String? videoName,
   }) async {
     try {
       // Create general category record
@@ -173,6 +178,10 @@ class CourseServices {
         course.generalCategory,
         photoFile,
         videoFile,
+        photoBytes,
+        photoName,
+        videoBytes,
+        videoName,
       );
 
       // Create executive category record
@@ -182,6 +191,10 @@ class CourseServices {
         course.executiveCategory,
         photoFile,
         videoFile,
+        photoBytes,
+        photoName,
+        videoBytes,
+        videoName,
       );
 
       return course;
@@ -199,6 +212,10 @@ class CourseServices {
     CourseCategory categoryData,
     File? photoFile,
     File? videoFile,
+    Uint8List? photoBytes,
+    String? photoName,
+    Uint8List? videoBytes,
+    String? videoName,
   ) async {
     final formData = FormData();
 
@@ -233,6 +250,13 @@ class CourseServices {
           ),
         ),
       );
+    } else if (photoBytes != null) {
+      formData.files.add(
+        MapEntry(
+          'course_photo',
+          MultipartFile.fromBytes(photoBytes, filename: (photoName ?? 'photo')),
+        ),
+      );
     }
 
     if (videoFile != null) {
@@ -243,6 +267,13 @@ class CourseServices {
             videoFile.path,
             filename: videoFile.path.split('/').last,
           ),
+        ),
+      );
+    } else if (videoBytes != null) {
+      formData.files.add(
+        MapEntry(
+          'course_video',
+          MultipartFile.fromBytes(videoBytes, filename: (videoName ?? 'video')),
         ),
       );
     }
@@ -265,6 +296,10 @@ class CourseServices {
     Course course, {
     File? photoFile,
     File? videoFile,
+    Uint8List? photoBytes,
+    String? photoName,
+    Uint8List? videoBytes,
+    String? videoName,
   }) async {
     try {
       // Get existing course records to find their IDs
@@ -293,6 +328,10 @@ class CourseServices {
           course.generalCategory,
           photoFile,
           videoFile,
+          photoBytes,
+          photoName,
+          videoBytes,
+          videoName,
         );
       }
 
@@ -305,6 +344,10 @@ class CourseServices {
           course.executiveCategory,
           photoFile,
           videoFile,
+          photoBytes,
+          photoName,
+          videoBytes,
+          videoName,
         );
       }
 
@@ -324,6 +367,10 @@ class CourseServices {
     CourseCategory categoryData,
     File? photoFile,
     File? videoFile,
+    Uint8List? photoBytes,
+    String? photoName,
+    Uint8List? videoBytes,
+    String? videoName,
   ) async {
     final formData = FormData();
 
@@ -358,6 +405,13 @@ class CourseServices {
           ),
         ),
       );
+    } else if (photoBytes != null) {
+      formData.files.add(
+        MapEntry(
+          'course_photo',
+          MultipartFile.fromBytes(photoBytes, filename: (photoName ?? 'photo')),
+        ),
+      );
     }
 
     if (videoFile != null) {
@@ -368,6 +422,13 @@ class CourseServices {
             videoFile.path,
             filename: videoFile.path.split('/').last,
           ),
+        ),
+      );
+    } else if (videoBytes != null) {
+      formData.files.add(
+        MapEntry(
+          'course_video',
+          MultipartFile.fromBytes(videoBytes, filename: (videoName ?? 'video')),
         ),
       );
     }
