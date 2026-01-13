@@ -47,8 +47,8 @@ class _EditCreateCourseCardState extends State<EditCreateCourseCard> {
   bool _installmentAvailable = false;
   bool _generalPlacementAssistance = false;
   bool _executivePlacementAssistance = false;
-  String _generalPlacementType = 'Assisted';
-  String _executivePlacementType = 'Assisted';
+  String? _generalPlacementType;
+  String? _executivePlacementType;
   String? _photoUrl;
   String? _photoDisplayName;
   File? _photoFile;
@@ -116,10 +116,12 @@ class _EditCreateCourseCardState extends State<EditCreateCourseCard> {
         widget.course?.generalCategory.placementAssistance ?? false;
     _executivePlacementAssistance =
         widget.course?.executiveCategory.placementAssistance ?? false;
-    _generalPlacementType =
-        widget.course?.generalCategory.placementType ?? 'Assisted';
-    _executivePlacementType =
-        widget.course?.executiveCategory.placementType ?? 'Assisted';
+    _generalPlacementType = _sanitizePlacementType(
+      widget.course?.generalCategory.placementType,
+    );
+    _executivePlacementType = _sanitizePlacementType(
+      widget.course?.executiveCategory.placementType,
+    );
     _photoUrl = widget.course?.photoUrl;
     _photoDisplayName = widget.course?.photoUrl != null
         ? 'Current Photo'
@@ -198,7 +200,7 @@ class _EditCreateCourseCardState extends State<EditCreateCourseCard> {
         generalCategory: CourseCategory(
           jobRolesOffered: _generalJobRolesController.text.trim(),
           placementAssistance: _generalPlacementAssistance,
-          placementType: _generalPlacementType,
+          placementType: _generalPlacementType ?? 'Assisted',
           placementRate:
               double.tryParse(_generalPlacementRateController.text.trim()) ?? 0,
           advantagesHighlights: _generalAdvantagesController.text.trim(),
@@ -207,7 +209,7 @@ class _EditCreateCourseCardState extends State<EditCreateCourseCard> {
         executiveCategory: CourseCategory(
           jobRolesOffered: _executiveJobRolesController.text.trim(),
           placementAssistance: _executivePlacementAssistance,
-          placementType: _executivePlacementType,
+          placementType: _executivePlacementType ?? 'Assisted',
           placementRate:
               double.tryParse(_executivePlacementRateController.text.trim()) ??
               0,
@@ -234,6 +236,11 @@ class _EditCreateCourseCardState extends State<EditCreateCourseCard> {
 
       Navigator.pop(context);
     }
+  }
+
+  String? _sanitizePlacementType(String? type) {
+    if (type == 'Assisted' || type == 'Guaranteed') return type;
+    return null;
   }
 
   @override
@@ -392,7 +399,7 @@ class _EditCreateCourseCardState extends State<EditCreateCourseCard> {
                         'General Category',
                         _generalJobRolesController,
                         _generalPlacementType,
-                        (val) => setState(() => _generalPlacementType = val!),
+                        (val) => setState(() => _generalPlacementType = val),
                         _generalPlacementRateController,
                         _generalAdvantagesController,
                         _generalFeesController,
@@ -409,7 +416,7 @@ class _EditCreateCourseCardState extends State<EditCreateCourseCard> {
                         'Executive Category',
                         _executiveJobRolesController,
                         _executivePlacementType,
-                        (val) => setState(() => _executivePlacementType = val!),
+                        (val) => setState(() => _executivePlacementType = val),
                         _executivePlacementRateController,
                         _executiveAdvantagesController,
                         _executiveFeesController,
@@ -550,7 +557,7 @@ class _EditCreateCourseCardState extends State<EditCreateCourseCard> {
   Widget _buildCategorySection(
     String title,
     TextEditingController jobRolesController,
-    String placementType,
+    String? placementType,
     Function(String?) onPlacementTypeChanged,
     TextEditingController placementRateController,
     TextEditingController advantagesController,
@@ -570,7 +577,10 @@ class _EditCreateCourseCardState extends State<EditCreateCourseCard> {
         _buildTwoColumnLayout(
           isDesktop,
           DropdownButtonFormField<String>(
-            value: placementType,
+            value:
+                (placementType == 'Assisted' || placementType == 'Guaranteed')
+                ? placementType
+                : null,
             decoration: InputDecoration(
               labelText: 'Placement Type *',
               border: OutlineInputBorder(
