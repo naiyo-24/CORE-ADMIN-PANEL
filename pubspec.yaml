@@ -44,9 +44,12 @@ dependencies:
   # File Picker
   file_picker: ^8.1.4
 
-  # HTTP Client with logging
+  # DIO package for API calls
   dio: ^5.4.0
   pretty_dio_logger: ^1.3.1
+
+  # Website URL Launcher
+  url_launcher: ^6.3.2
 
 dev_dependencies:
   flutter_test:

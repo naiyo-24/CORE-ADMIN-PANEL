@@ -5,6 +5,8 @@ import '../../controllers/course_controller.dart';
 import '../../models/course.dart';
 import 'edit_create_course_card.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
+import '../../services/course_services.dart';
 
 class CourseCard extends StatefulWidget {
   final Course course;
@@ -32,6 +34,20 @@ class _CourseCardState extends State<CourseCard> {
         ? widget.course.generalCategory
         : widget.course.executiveCategory;
 
+    // Helper to get full photo/video URL using CourseServices
+    String? photoUrl = widget.course.photoUrl;
+    if (photoUrl != null &&
+        photoUrl.isNotEmpty &&
+        !photoUrl.startsWith('http')) {
+      photoUrl = CourseServices.getFullMediaUrl(photoUrl);
+    }
+    String? videoUrl = widget.course.videoUrl;
+    if (videoUrl != null &&
+        videoUrl.isNotEmpty &&
+        !videoUrl.startsWith('http')) {
+      videoUrl = CourseServices.getFullMediaUrl(videoUrl);
+    }
+
     return Container(
       decoration: BoxDecoration(
         color: AppColors.white,
@@ -49,9 +65,33 @@ class _CourseCardState extends State<CourseCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header with title and category toggle
+          // Header with photo, title, and category toggle
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Course Photo
+              if (photoUrl != null && photoUrl.isNotEmpty)
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.network(
+                    photoUrl,
+                    width: 64,
+                    height: 64,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) => Container(
+                      width: 64,
+                      height: 64,
+                      color: AppColors.lightGray,
+                      child: const Icon(
+                        Icons.broken_image,
+                        color: AppColors.darkGrayLight,
+                      ),
+                    ),
+                  ),
+                ),
+              if (photoUrl != null && photoUrl.isNotEmpty)
+                const SizedBox(width: 16),
+              // Name and code
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -223,10 +263,41 @@ class _CourseCardState extends State<CourseCard> {
           ),
           const SizedBox(height: 20),
 
-          // Action buttons
+          // Action buttons and video button
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
+              // Video button
+              if (videoUrl != null && videoUrl.isNotEmpty)
+                ElevatedButton.icon(
+                  onPressed: () async {
+                    if (await canLaunchUrl(Uri.parse(videoUrl!))) {
+                      await launchUrl(
+                        Uri.parse(videoUrl),
+                        mode: LaunchMode.externalApplication,
+                      );
+                    } else {
+                      Get.snackbar(
+                        'Error',
+                        'Could not open video URL',
+                        backgroundColor: AppColors.errorRed,
+                        colorText: AppColors.white,
+                      );
+                    }
+                  },
+                  icon: const Icon(Icons.play_circle_fill, size: 18),
+                  label: const Text('Tap to see Course video'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.accentBlue,
+                    foregroundColor: AppColors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                  ),
+                ),
+              if (videoUrl != null && videoUrl.isNotEmpty)
+                const SizedBox(width: 12),
               ElevatedButton.icon(
                 onPressed: () {
                   showDialog(

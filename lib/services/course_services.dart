@@ -7,6 +7,19 @@ import '../models/course.dart';
 import 'api_url.dart';
 
 class CourseServices {
+  /// Returns the full URL for a media asset (photo/video) given a relative path.
+  static String getFullMediaUrl(String relativePath) {
+    if (relativePath.startsWith('http')) return relativePath;
+    String base = ApiUrl.baseUrl;
+    // Remove trailing slash from base if present
+    if (base.endsWith('/')) base = base.substring(0, base.length - 1);
+    // Remove leading slash from relativePath if present
+    String rel = relativePath.startsWith('/')
+        ? relativePath.substring(1)
+        : relativePath;
+    return '$base/$rel';
+  }
+
   static final Dio _dio =
       Dio(
           BaseOptions(
