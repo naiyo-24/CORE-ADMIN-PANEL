@@ -11,7 +11,7 @@ class StudentTableCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = AppTheme.textThemeFromContext(context);
-    final studentController = Get.find<StudentController>();
+    final studentController = Get.put(StudentController());
 
     return Container(
       decoration: BoxDecoration(
@@ -180,14 +180,15 @@ class StudentTableCard extends StatelessWidget {
                 ],
                 rows: List.generate(students.length, (index) {
                   final student = students[index];
-
                   return DataRow(
                     color: MaterialStateColor.resolveWith(
                       (_) =>
                           index.isEven ? AppColors.white : AppColors.lightGray,
                     ),
                     cells: [
-                      DataCell(Text(student.id, style: textTheme.bodySmall)),
+                      DataCell(
+                        Text(student.studentId, style: textTheme.bodySmall),
+                      ),
                       DataCell(
                         Container(
                           width: 40,
@@ -196,11 +197,13 @@ class StudentTableCard extends StatelessWidget {
                             color: AppColors.lightGray,
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: student.profilePhotoUrl != null
+                          child:
+                              student.profilePhoto != null &&
+                                  student.profilePhoto!.isNotEmpty
                               ? ClipRRect(
                                   borderRadius: BorderRadius.circular(8),
                                   child: Image.network(
-                                    student.profilePhotoUrl!,
+                                    student.profilePhoto!,
                                     fit: BoxFit.cover,
                                     errorBuilder: (context, error, stackTrace) {
                                       return const Icon(
@@ -225,7 +228,7 @@ class StudentTableCard extends StatelessWidget {
                         ),
                       ),
                       DataCell(
-                        Text(student.phoneNumber, style: textTheme.bodySmall),
+                        Text(student.phoneNo, style: textTheme.bodySmall),
                       ),
                       DataCell(Text(student.email, style: textTheme.bodySmall)),
                       DataCell(
@@ -240,26 +243,32 @@ class StudentTableCard extends StatelessWidget {
                         ),
                       ),
                       DataCell(
-                        Text(student.course, style: textTheme.bodySmall),
+                        Text(
+                          student.courseAvailing,
+                          style: textTheme.bodySmall,
+                        ),
                       ),
                       DataCell(
                         Text(student.guardianName, style: textTheme.bodySmall),
                       ),
                       DataCell(
                         Text(
-                          student.guardianPhoneNumber,
+                          student.guardianMobileNo,
                           style: textTheme.bodySmall,
                         ),
                       ),
                       DataCell(
-                        Text(student.guardianEmail, style: textTheme.bodySmall),
+                        Text(
+                          student.guardianEmail ?? '-',
+                          style: textTheme.bodySmall,
+                        ),
                       ),
                       DataCell(
                         SizedBox(
                           width: 150,
                           child: Wrap(
                             spacing: 4,
-                            children: student.interests
+                            children: (student.interests ?? [])
                                 .take(2)
                                 .map(
                                   (interest) => Container(
@@ -312,7 +321,7 @@ class StudentTableCard extends StatelessWidget {
                               onPressed: () {
                                 _showDeleteConfirmation(
                                   context,
-                                  student.id,
+                                  student.studentId,
                                   student.fullName,
                                   studentController,
                                 );

@@ -1,3 +1,4 @@
+import 'package:application_admin_panel/services/course_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:get/get.dart';
@@ -22,7 +23,9 @@ class _StudentOnboardEditCardState extends State<StudentOnboardEditCard> {
   late TextEditingController _phoneController;
   late TextEditingController _emailController;
   late TextEditingController _addressController;
-  late TextEditingController _courseController;
+  String? _selectedCourseId;
+  List<Map<String, String>> _courseOptions = [];
+  bool _isLoadingCourses = false;
   late TextEditingController _guardianNameController;
   late TextEditingController _guardianPhoneController;
   late TextEditingController _guardianEmailController;
@@ -41,33 +44,56 @@ class _StudentOnboardEditCardState extends State<StudentOnboardEditCard> {
       text: widget.student?.fullName ?? '',
     );
     _phoneController = TextEditingController(
-      text: widget.student?.phoneNumber ?? '',
+      text: widget.student?.phoneNo ?? '',
     );
     _emailController = TextEditingController(text: widget.student?.email ?? '');
     _addressController = TextEditingController(
       text: widget.student?.address ?? '',
     );
-    _courseController = TextEditingController(
-      text: widget.student?.course ?? '',
-    );
+    _selectedCourseId = widget.student?.courseAvailing;
+    _fetchCourses();
+
     _guardianNameController = TextEditingController(
       text: widget.student?.guardianName ?? '',
     );
     _guardianPhoneController = TextEditingController(
-      text: widget.student?.guardianPhoneNumber ?? '',
+      text: widget.student?.guardianMobileNo ?? '',
     );
     _guardianEmailController = TextEditingController(
       text: widget.student?.guardianEmail ?? '',
     );
     _interestsController = TextEditingController(
-      text: widget.student?.interests.join(', ') ?? '',
+      text: widget.student?.interests?.join(', ') ?? '',
     );
     _passwordController = TextEditingController(
       text: widget.student?.password ?? '',
     );
-    _enrollmentDate = widget.student?.enrollmentDate ?? DateTime.now();
-    _selectedFileName = widget.student?.profilePhotoUrl;
-    _selectedFilePath = widget.student?.profilePhotoUrl;
+    _enrollmentDate = widget.student?.createdAt ?? DateTime.now();
+    _selectedFileName = widget.student?.profilePhoto;
+    _selectedFilePath = widget.student?.profilePhoto;
+  }
+
+  Future<void> _fetchCourses() async {
+    setState(() {
+      _isLoadingCourses = true;
+    });
+    try {
+      final courses = await CourseServices.getAllCourses();
+      setState(() {
+        _courseOptions = courses
+            .map((c) => {'id': c.id, 'name': c.name})
+            .toList();
+        if (_selectedCourseId == null && _courseOptions.isNotEmpty) {
+          _selectedCourseId = _courseOptions.first['id'];
+        }
+      });
+    } catch (e) {
+      // Optionally show error
+    } finally {
+      setState(() {
+        _isLoadingCourses = false;
+      });
+    }
   }
 
   @override
@@ -76,7 +102,7 @@ class _StudentOnboardEditCardState extends State<StudentOnboardEditCard> {
     _phoneController.dispose();
     _emailController.dispose();
     _addressController.dispose();
-    _courseController.dispose();
+    // No controller to dispose for dropdown
     _guardianNameController.dispose();
     _guardianPhoneController.dispose();
     _guardianEmailController.dispose();
@@ -247,15 +273,9 @@ class _StudentOnboardEditCardState extends State<StudentOnboardEditCard> {
                               textTheme,
                               isRequired: true,
                             ),
-                            _buildTextField(
-                              'Course',
-                              _courseController,
-                              'Enter course name',
-                              FontAwesomeIcons.graduationCap,
-                              textTheme,
-                              isRequired: true,
-                            ),
+                            _buildCourseDropdown(textTheme),
                           ]),
+
                           const SizedBox(height: 16),
                           _buildTextField(
                             'Address',
@@ -343,6 +363,85 @@ class _StudentOnboardEditCardState extends State<StudentOnboardEditCard> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildCourseDropdown(TextTheme textTheme) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Text(
+              'Course',
+              style: textTheme.bodyMedium?.copyWith(
+                color: AppColors.darkGray,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const Text(' *', style: TextStyle(color: AppColors.errorRed)),
+          ],
+        ),
+        const SizedBox(height: 8),
+        _isLoadingCourses
+            ? const CircularProgressIndicator()
+            : DropdownButtonFormField<String>(
+                value: _selectedCourseId,
+                isExpanded: true,
+                items: _courseOptions.map<DropdownMenuItem<String>>((course) {
+                  final id = course['id'] ?? '';
+                  final name = course['name'] ?? '';
+                  return DropdownMenuItem<String>(value: id, child: Text(name));
+                }).toList(),
+                onChanged: (val) {
+                  setState(() {
+                    _selectedCourseId = val;
+                  });
+                },
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: const BorderSide(
+                      color: AppColors.borderGray,
+                      width: 1.5,
+                    ),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: const BorderSide(
+                      color: AppColors.borderGray,
+                      width: 1.5,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: const BorderSide(
+                      color: AppColors.darkRed,
+                      width: 2,
+                    ),
+                  ),
+                  errorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: const BorderSide(
+                      color: AppColors.errorRed,
+                      width: 1.5,
+                    ),
+                  ),
+                  filled: true,
+                  fillColor: AppColors.lightGray,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please select a course';
+                  }
+                  return null;
+                },
+              ),
+      ],
     );
   }
 
@@ -616,7 +715,7 @@ class _StudentOnboardEditCardState extends State<StudentOnboardEditCard> {
     );
   }
 
-  void _saveStudent(StudentController controller, bool isEditing) {
+  void _saveStudent(StudentController controller, bool isEditing) async {
     if (!_formKey.currentState!.validate()) {
       Get.snackbar(
         'Validation Error',
@@ -647,31 +746,63 @@ class _StudentOnboardEditCardState extends State<StudentOnboardEditCard> {
         .toList();
 
     final student = Student(
-      id: isEditing
-          ? widget.student!.id
-          : 'STU${DateTime.now().millisecondsSinceEpoch}',
+      studentId: isEditing ? widget.student!.studentId : '',
       fullName: _fullNameController.text.trim(),
-      phoneNumber: _phoneController.text.trim(),
+      phoneNo: _phoneController.text.trim(),
       email: _emailController.text.trim(),
       address: _addressController.text.trim(),
-      course: _courseController.text.trim(),
+      courseAvailing: _selectedCourseId ?? '',
       guardianName: _guardianNameController.text.trim(),
-      guardianPhoneNumber: _guardianPhoneController.text.trim(),
+      guardianMobileNo: _guardianPhoneController.text.trim(),
       guardianEmail: _guardianEmailController.text.trim(),
       interests: interests,
-      profilePhotoUrl: _selectedFilePath,
-      enrollmentDate: _enrollmentDate!,
+      hobbies: [],
+      profilePhoto: null, // Don't send as string
       password: _passwordController.text.trim(),
+      createdAt: _enrollmentDate!,
+      updatedAt: DateTime.now(),
+      courseName: null,
     );
 
+    // Prepare file upload args
+    String? filePath;
+    List<int>? fileBytes;
+    String? fileName;
+    if (_selectedFileName != null) {
+      if (kIsWeb) {
+        // On web, use bytes
+        final result = await FilePicker.platform.pickFiles(
+          type: FileType.image,
+          allowMultiple: false,
+          withData: true,
+        );
+        if (result != null) {
+          fileBytes = result.files.single.bytes;
+          fileName = result.files.single.name;
+        }
+      } else {
+        // On native, use file path
+        filePath = _selectedFilePath;
+      }
+    }
+
     if (isEditing) {
-      controller.editStudent(widget.student!.id, student).then((_) {
-        if (mounted) Navigator.pop(context);
-      });
+      await controller.editStudent(
+        student.studentId,
+        student,
+        filePath: filePath,
+        fileBytes: fileBytes,
+        fileName: fileName,
+      );
+      if (mounted) Navigator.pop(context);
     } else {
-      controller.addStudent(student).then((_) {
-        if (mounted) Navigator.pop(context);
-      });
+      await controller.addStudent(
+        student,
+        filePath: filePath,
+        fileBytes: fileBytes,
+        fileName: fileName,
+      );
+      if (mounted) Navigator.pop(context);
     }
   }
 }
