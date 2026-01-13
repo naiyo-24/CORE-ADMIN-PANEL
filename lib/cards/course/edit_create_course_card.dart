@@ -53,6 +53,8 @@ class _EditCreateCourseCardState extends State<EditCreateCourseCard> {
   String? _photoDisplayName;
   File? _photoFile;
   File? _videoFile;
+  String? _videoUrl;
+  String? _videoDisplayName;
 
   @override
   void initState() {
@@ -126,6 +128,10 @@ class _EditCreateCourseCardState extends State<EditCreateCourseCard> {
     _photoDisplayName = widget.course?.photoUrl != null
         ? 'Current Photo'
         : null;
+    _videoUrl = widget.course?.videoUrl;
+    _videoDisplayName = widget.course?.videoUrl != null
+        ? 'Current Video'
+        : null;
   }
 
   @override
@@ -173,6 +179,34 @@ class _EditCreateCourseCardState extends State<EditCreateCourseCard> {
       Get.snackbar(
         'Error',
         'Failed to pick course photo: $e',
+        backgroundColor: AppColors.errorRed,
+        colorText: AppColors.white,
+      );
+    }
+  }
+
+  Future<void> _pickCourseVideo() async {
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.video,
+        withData: true,
+      );
+
+      if (result != null) {
+        setState(() {
+          _videoDisplayName = result.files.single.name;
+          if (!kIsWeb && result.files.single.path != null) {
+            _videoFile = File(result.files.single.path!);
+            _videoUrl = result.files.single.path;
+          } else {
+            _videoUrl = result.files.single.name;
+          }
+        });
+      }
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Failed to pick course video: $e',
         backgroundColor: AppColors.errorRed,
         colorText: AppColors.white,
       );
@@ -452,6 +486,42 @@ class _EditCreateCourseCardState extends State<EditCreateCourseCard> {
                                   _photoDisplayName ?? 'Choose Course Photo',
                                   style: TextStyle(
                                     color: _photoUrl != null
+                                        ? AppColors.darkGray
+                                        : AppColors.darkGrayLight,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 32),
+
+                      // Video Upload
+                      _buildSectionTitle('Course Video', textTheme),
+                      const SizedBox(height: 16),
+                      InkWell(
+                        onTap: _pickCourseVideo,
+                        child: Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: AppColors.borderGray),
+                            borderRadius: BorderRadius.circular(8),
+                            color: AppColors.lightGray,
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.cloud_upload,
+                                color: AppColors.darkRed,
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  _videoDisplayName ?? 'Choose Course Video',
+                                  style: TextStyle(
+                                    color: _videoUrl != null
                                         ? AppColors.darkGray
                                         : AppColors.darkGrayLight,
                                   ),
