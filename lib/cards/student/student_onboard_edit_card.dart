@@ -34,6 +34,7 @@ class _StudentOnboardEditCardState extends State<StudentOnboardEditCard> {
   DateTime? _enrollmentDate;
   String? _selectedFileName;
   String? _selectedFilePath;
+  List<int>? _selectedFileBytes;
 
   @override
   void initState() {
@@ -582,12 +583,12 @@ class _StudentOnboardEditCardState extends State<StudentOnboardEditCard> {
             if (result != null) {
               setState(() {
                 _selectedFileName = result.files.single.name;
-                // On web, path is not available, so just use the file name
-                // On native platforms, use the actual file path
                 if (kIsWeb) {
                   _selectedFilePath = result.files.single.name;
+                  _selectedFileBytes = result.files.single.bytes;
                 } else {
                   _selectedFilePath = result.files.single.path;
+                  _selectedFileBytes = null;
                 }
               });
             }
@@ -770,16 +771,12 @@ class _StudentOnboardEditCardState extends State<StudentOnboardEditCard> {
     String? fileName;
     if (_selectedFileName != null) {
       if (kIsWeb) {
-        // On web, use bytes
-        final result = await FilePicker.platform.pickFiles(
-          type: FileType.image,
-          allowMultiple: false,
-          withData: true,
-        );
-        if (result != null) {
-          fileBytes = result.files.single.bytes;
-          fileName = result.files.single.name;
-        }
+        // On web, use bytes already picked
+        // _selectedFilePath is actually the file name, not path
+        // You need to store the bytes when picking the file
+        // So, add a new field: List<int>? _selectedFileBytes;
+        fileBytes = _selectedFileBytes;
+        fileName = _selectedFileName;
       } else {
         // On native, use file path
         filePath = _selectedFilePath;
