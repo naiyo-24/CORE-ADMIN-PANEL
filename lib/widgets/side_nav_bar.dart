@@ -46,7 +46,7 @@ class SideNavBar extends StatelessWidget {
         'index': 4,
         'label': 'Course Management',
         'icon': FontAwesomeIcons.bookOpen,
-        'route': '',
+        'route': AppRoutes.courses,
       },
       {
         'index': 5,
