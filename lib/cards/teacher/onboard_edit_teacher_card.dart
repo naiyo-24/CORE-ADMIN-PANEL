@@ -16,6 +16,21 @@ class OnboardEditTeacherCard extends StatefulWidget {
 }
 
 class _OnboardEditTeacherCardState extends State<OnboardEditTeacherCard> {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Fetch courses if not already loaded
+    if (teacherController.courses.isEmpty) {
+      teacherController.fetchCourses();
+    }
+    // If editing, pre-select courses
+    if (widget.teacher != null && teacherController.selectedCourseIds.isEmpty) {
+      teacherController.selectedCourseIds.assignAll(
+        widget.teacher!.coursesAssigned.map((e) => e.toString()).toList(),
+      );
+    }
+  }
+
   final _formKey = GlobalKey<FormState>();
   final teacherController = Get.find<TeacherController>();
 
@@ -24,11 +39,16 @@ class _OnboardEditTeacherCardState extends State<OnboardEditTeacherCard> {
   late final TextEditingController _emailController;
   late final TextEditingController _altPhoneController;
   late final TextEditingController _addressController;
-  late final TextEditingController _specializationController;
-  late final TextEditingController _classroomsController;
+  late final TextEditingController _qualificationController;
   late final TextEditingController _experienceController;
+  // courses selection handled via teacherController.selectedCourseIds
+  late final TextEditingController _bankAccountNoController;
+  late final TextEditingController _bankAccountNameController;
+  late final TextEditingController _bankBranchNameController;
+  late final TextEditingController _ifscCodeController;
+  late final TextEditingController _upiidController;
+  late final TextEditingController _monthlySalaryController;
   late final TextEditingController _passwordController;
-  late final TextEditingController _bioController;
 
   String? _selectedProfilePhoto;
   String? _profilePhotoDisplayName;
@@ -37,34 +57,51 @@ class _OnboardEditTeacherCardState extends State<OnboardEditTeacherCard> {
   void initState() {
     super.initState();
     _teacherNameController = TextEditingController(
-      text: widget.teacher?.teacherName ?? '',
+      text: widget.teacher?.fullName ?? '',
     );
     _phoneController = TextEditingController(
-      text: widget.teacher?.phoneNumber ?? '',
+      text: widget.teacher?.phoneNo ?? '',
     );
     _emailController = TextEditingController(text: widget.teacher?.email ?? '');
     _altPhoneController = TextEditingController(
-      text: widget.teacher?.alternativePhoneNumber ?? '',
+      text: widget.teacher?.alternativePhoneNo ?? '',
     );
     _addressController = TextEditingController(
       text: widget.teacher?.address ?? '',
     );
-    _specializationController = TextEditingController(
-      text: widget.teacher?.specialization ?? '',
-    );
-    _classroomsController = TextEditingController(
-      text: widget.teacher?.classroomsInCharge.join(', ') ?? '',
+    _qualificationController = TextEditingController(
+      text: widget.teacher?.qualification ?? '',
     );
     _experienceController = TextEditingController(
-      text: widget.teacher?.experienceYears.toString() ?? '',
+      text: widget.teacher?.experience ?? '',
+    );
+    // _coursesAssignedController is no longer needed
+    _bankAccountNoController = TextEditingController(
+      text: widget.teacher?.bankAccountNo ?? '',
+    );
+    _bankAccountNameController = TextEditingController(
+      text: widget.teacher?.bankAccountName ?? '',
+    );
+    _bankBranchNameController = TextEditingController(
+      text: widget.teacher?.bankBranchName ?? '',
+    );
+    _ifscCodeController = TextEditingController(
+      text: widget.teacher?.ifscCode ?? '',
+    );
+    _upiidController = TextEditingController(text: widget.teacher?.upiid ?? '');
+    _monthlySalaryController = TextEditingController(
+      text: widget.teacher?.monthlySalary?.toString() ?? '',
     );
     _passwordController = TextEditingController(
       text: widget.teacher?.password ?? '',
     );
-    _bioController = TextEditingController(text: widget.teacher?.bio ?? '');
 
-    if (widget.teacher?.profilePhotoUrl != null) {
-      _selectedProfilePhoto = widget.teacher!.profilePhotoUrl;
+    if (widget.teacher == null) {
+      teacherController.selectedCourseIds.clear();
+    }
+
+    if (widget.teacher?.profilePhoto != null) {
+      _selectedProfilePhoto = widget.teacher!.profilePhoto;
       _profilePhotoDisplayName = 'Current Photo';
     }
   }
@@ -76,11 +113,16 @@ class _OnboardEditTeacherCardState extends State<OnboardEditTeacherCard> {
     _emailController.dispose();
     _altPhoneController.dispose();
     _addressController.dispose();
-    _specializationController.dispose();
-    _classroomsController.dispose();
+    _qualificationController.dispose();
     _experienceController.dispose();
+    // selectedCourseIds handled by controller; no local controller to dispose
+    _bankAccountNoController.dispose();
+    _bankAccountNameController.dispose();
+    _bankBranchNameController.dispose();
+    _ifscCodeController.dispose();
+    _upiidController.dispose();
+    _monthlySalaryController.dispose();
     _passwordController.dispose();
-    _bioController.dispose();
     super.dispose();
   }
 
@@ -116,27 +158,37 @@ class _OnboardEditTeacherCardState extends State<OnboardEditTeacherCard> {
     if (_formKey.currentState!.validate()) {
       final teacher = Teacher(
         id: widget.teacher?.id ?? '',
-        teacherName: _teacherNameController.text.trim(),
-        phoneNumber: _phoneController.text.trim(),
+        fullName: _teacherNameController.text.trim(),
+        phoneNo: _phoneController.text.trim(),
         email: _emailController.text.trim(),
-        alternativePhoneNumber: _altPhoneController.text.trim(),
+        alternativePhoneNo: _altPhoneController.text.trim(),
         address: _addressController.text.trim(),
-        specialization: _specializationController.text.trim(),
-        classroomsInCharge: _classroomsController.text
-            .split(',')
-            .map((e) => e.trim())
-            .where((e) => e.isNotEmpty)
-            .toList(),
-        experienceYears: int.tryParse(_experienceController.text.trim()) ?? 0,
-        profilePhotoUrl: _selectedProfilePhoto,
+        qualification: _qualificationController.text.trim(),
+        experience: _experienceController.text.trim(),
+        coursesAssigned: List<String>.from(teacherController.selectedCourseIds),
+        bankAccountNo: _bankAccountNoController.text.trim(),
+        bankAccountName: _bankAccountNameController.text.trim(),
+        bankBranchName: _bankBranchNameController.text.trim(),
+        ifscCode: _ifscCodeController.text.trim(),
+        upiid: _upiidController.text.trim(),
+        monthlySalary: _monthlySalaryController.text.isNotEmpty
+            ? double.tryParse(_monthlySalaryController.text.trim())
+            : null,
         password: _passwordController.text.trim(),
-        bio: _bioController.text.trim(),
+        profilePhoto: _selectedProfilePhoto,
       );
 
       if (widget.teacher == null) {
-        teacherController.addTeacher(teacher);
+        teacherController.addTeacher(
+          teacher,
+          profilePhotoPath: _selectedProfilePhoto,
+        );
       } else {
-        teacherController.editTeacher(widget.teacher!.id, teacher);
+        teacherController.editTeacher(
+          widget.teacher!.id,
+          teacher,
+          profilePhotoPath: _selectedProfilePhoto,
+        );
       }
 
       Navigator.pop(context);
@@ -195,19 +247,22 @@ class _OnboardEditTeacherCardState extends State<OnboardEditTeacherCard> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildSectionTitle('Personal Information', textTheme),
+                      _buildSectionTitle('Teacher Details', textTheme),
                       const SizedBox(height: 16),
                       _buildTwoColumnLayout(
                         isDesktop,
                         _buildTextField(
                           controller: _teacherNameController,
-                          label: 'Teacher Name *',
-                          validator: (val) => val!.isEmpty ? 'Required' : null,
+                          label: 'Full Name',
+                          validator: (v) =>
+                              v == null || v.isEmpty ? 'Required' : null,
                         ),
                         _buildTextField(
                           controller: _phoneController,
-                          label: 'Phone Number *',
-                          validator: (val) => val!.isEmpty ? 'Required' : null,
+                          label: 'Phone Number',
+                          keyboardType: TextInputType.phone,
+                          validator: (v) =>
+                              v == null || v.isEmpty ? 'Required' : null,
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -215,110 +270,144 @@ class _OnboardEditTeacherCardState extends State<OnboardEditTeacherCard> {
                         isDesktop,
                         _buildTextField(
                           controller: _emailController,
-                          label: 'Email *',
-                          validator: (val) {
-                            if (val!.isEmpty) return 'Required';
-                            if (!GetUtils.isEmail(val)) return 'Invalid email';
-                            return null;
-                          },
+                          label: 'Email',
+                          keyboardType: TextInputType.emailAddress,
                         ),
                         _buildTextField(
                           controller: _altPhoneController,
-                          label: 'Alternative Phone Number *',
-                          validator: (val) => val!.isEmpty ? 'Required' : null,
+                          label: 'Alternative Phone',
+                          keyboardType: TextInputType.phone,
                         ),
                       ),
-                      const SizedBox(height: 16),
-                      _buildTextField(
-                        controller: _addressController,
-                        label: 'Address *',
-                        maxLines: 2,
-                        validator: (val) => val!.isEmpty ? 'Required' : null,
-                      ),
-                      const SizedBox(height: 32),
-                      _buildSectionTitle('Professional Information', textTheme),
                       const SizedBox(height: 16),
                       _buildTwoColumnLayout(
                         isDesktop,
                         _buildTextField(
-                          controller: _specializationController,
-                          label: 'Specialization *',
-                          validator: (val) => val!.isEmpty ? 'Required' : null,
+                          controller: _addressController,
+                          label: 'Address',
                         ),
+                        _buildTextField(
+                          controller: _qualificationController,
+                          label: 'Qualification',
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      _buildTwoColumnLayout(
+                        isDesktop,
                         _buildTextField(
                           controller: _experienceController,
-                          label: 'Experience (Years) *',
-                          keyboardType: TextInputType.number,
-                          validator: (val) {
-                            if (val!.isEmpty) return 'Required';
-                            if (int.tryParse(val) == null) {
-                              return 'Enter valid number';
-                            }
-                            return null;
-                          },
+                          label: 'Experience',
                         ),
-                      ),
-                      const SizedBox(height: 16),
-                      _buildTextField(
-                        controller: _classroomsController,
-                        label: 'Classrooms in Charge (comma-separated) *',
-                        hint: 'e.g., Room 101, Lab A, Classroom 5',
-                        validator: (val) => val!.isEmpty ? 'Required' : null,
-                      ),
-                      const SizedBox(height: 32),
-                      _buildSectionTitle('Additional Information', textTheme),
-                      const SizedBox(height: 16),
-                      _buildTextField(
-                        controller: _bioController,
-                        label: 'Bio *',
-                        maxLines: 4,
-                        hint: 'Write a brief bio about the teacher...',
-                        validator: (val) => val!.isEmpty ? 'Required' : null,
+                        Obx(() {
+                          final courses = teacherController.courses;
+                          return InputDecorator(
+                            decoration: InputDecoration(
+                              labelText: 'Assign Courses',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            child: courses.isEmpty
+                                ? const Text('No courses available')
+                                : Wrap(
+                                    spacing: 8,
+                                    children: courses.map((course) {
+                                      final courseId = course.id;
+                                      final courseName = course.name;
+                                      final isSelected = teacherController
+                                          .selectedCourseIds
+                                          .contains(courseId);
+                                      return FilterChip(
+                                        label: Text(courseName),
+                                        selected: isSelected,
+                                        onSelected: (selected) {
+                                          setState(() {
+                                            if (selected) {
+                                              teacherController
+                                                  .selectedCourseIds
+                                                  .add(courseId);
+                                            } else {
+                                              teacherController
+                                                  .selectedCourseIds
+                                                  .remove(courseId);
+                                            }
+                                          });
+                                        },
+                                      );
+                                    }).toList(),
+                                  ),
+                          );
+                        }),
                       ),
                       const SizedBox(height: 16),
                       _buildTwoColumnLayout(
                         isDesktop,
-                        _buildFilePicker(),
                         _buildTextField(
-                          controller: _passwordController,
-                          label: 'Password *',
-                          obscureText: true,
-                          validator: (val) {
-                            if (val!.isEmpty) return 'Required';
-                            if (val.length < 6) {
-                              return 'Password must be at least 6 characters';
-                            }
-                            return null;
-                          },
+                          controller: _bankAccountNoController,
+                          label: 'Bank Account No',
+                        ),
+                        _buildTextField(
+                          controller: _bankAccountNameController,
+                          label: 'Bank Account Name',
                         ),
                       ),
+                      const SizedBox(height: 16),
+                      _buildTwoColumnLayout(
+                        isDesktop,
+                        _buildTextField(
+                          controller: _bankBranchNameController,
+                          label: 'Bank Branch Name',
+                        ),
+                        _buildTextField(
+                          controller: _ifscCodeController,
+                          label: 'IFSC Code',
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      _buildTwoColumnLayout(
+                        isDesktop,
+                        _buildTextField(
+                          controller: _upiidController,
+                          label: 'UPI ID',
+                        ),
+                        _buildTextField(
+                          controller: _monthlySalaryController,
+                          label: 'Monthly Salary',
+                          keyboardType: TextInputType.number,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      _buildTwoColumnLayout(
+                        isDesktop,
+                        _buildTextField(
+                          controller: _passwordController,
+                          label: 'Password',
+                          obscureText: true,
+                        ),
+                        _buildFilePicker(),
+                      ),
                       const SizedBox(height: 32),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: Text(
-                              'Cancel',
-                              style: TextStyle(color: AppColors.darkGray),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: ElevatedButton(
+                          onPressed: _saveTeacher,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.darkRed,
+                            foregroundColor: AppColors.white,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 32,
+                              vertical: 16,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
                             ),
                           ),
-                          const SizedBox(width: 16),
-                          ElevatedButton(
-                            onPressed: _saveTeacher,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.darkRed,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 32,
-                                vertical: 16,
-                              ),
-                            ),
-                            child: Text(
-                              widget.teacher == null ? 'Add Teacher' : 'Save',
-                              style: TextStyle(color: AppColors.white),
-                            ),
+                          child: Text(
+                            widget.teacher == null
+                                ? 'Onboard Teacher'
+                                : 'Update Teacher',
                           ),
-                        ],
+                        ),
                       ),
                     ],
                   ),

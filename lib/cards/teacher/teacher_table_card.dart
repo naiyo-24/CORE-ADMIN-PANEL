@@ -44,9 +44,7 @@ class TeacherTableCard extends StatelessWidget {
                 child: CircularProgressIndicator(color: AppColors.darkRed),
               );
             }
-
             final teachers = teacherController.filteredTeachers;
-
             if (teachers.isEmpty) {
               return Center(
                 child: Padding(
@@ -60,7 +58,6 @@ class TeacherTableCard extends StatelessWidget {
                 ),
               );
             }
-
             return SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: DataTable(
@@ -171,14 +168,18 @@ class TeacherTableCard extends StatelessWidget {
                 ],
                 rows: List.generate(teachers.length, (index) {
                   final teacher = teachers[index];
-
                   return DataRow(
                     color: MaterialStateColor.resolveWith(
                       (_) =>
                           index.isEven ? AppColors.white : AppColors.lightGray,
                     ),
                     cells: [
-                      DataCell(Text(teacher.id, style: textTheme.bodySmall)),
+                      DataCell(
+                        Text(
+                          teacher.id.isNotEmpty ? teacher.id : '-',
+                          style: textTheme.bodySmall,
+                        ),
+                      ),
                       DataCell(
                         Container(
                           width: 40,
@@ -187,11 +188,13 @@ class TeacherTableCard extends StatelessWidget {
                             color: AppColors.lightGray,
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: teacher.profilePhotoUrl != null
+                          child:
+                              (teacher.profilePhoto != null &&
+                                  teacher.profilePhoto!.isNotEmpty)
                               ? ClipRRect(
                                   borderRadius: BorderRadius.circular(8),
                                   child: Image.network(
-                                    teacher.profilePhotoUrl!,
+                                    teacher.profilePhoto!,
                                     fit: BoxFit.cover,
                                     errorBuilder: (context, error, stackTrace) {
                                       return const Icon(
@@ -209,19 +212,33 @@ class TeacherTableCard extends StatelessWidget {
                       ),
                       DataCell(
                         Text(
-                          teacher.teacherName,
+                          (teacher.fullName ?? '').isNotEmpty
+                              ? teacher.fullName!
+                              : '-',
                           style: textTheme.bodySmall?.copyWith(
                             fontWeight: FontWeight.w600,
                           ),
                         ),
                       ),
                       DataCell(
-                        Text(teacher.phoneNumber, style: textTheme.bodySmall),
+                        Text(
+                          (teacher.phoneNo ?? '').isNotEmpty
+                              ? teacher.phoneNo!
+                              : '-',
+                          style: textTheme.bodySmall,
+                        ),
                       ),
-                      DataCell(Text(teacher.email, style: textTheme.bodySmall)),
                       DataCell(
                         Text(
-                          teacher.alternativePhoneNumber,
+                          (teacher.email ?? '').isNotEmpty
+                              ? teacher.email!
+                              : '-',
+                          style: textTheme.bodySmall,
+                        ),
+                      ),
+                      DataCell(
+                        Text(
+                          teacher.alternativePhoneNo ?? '-',
                           style: textTheme.bodySmall,
                         ),
                       ),
@@ -229,7 +246,7 @@ class TeacherTableCard extends StatelessWidget {
                         SizedBox(
                           width: 150,
                           child: Text(
-                            teacher.address,
+                            teacher.address ?? '-',
                             style: textTheme.bodySmall,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
@@ -238,7 +255,7 @@ class TeacherTableCard extends StatelessWidget {
                       ),
                       DataCell(
                         Text(
-                          teacher.specialization,
+                          teacher.qualification ?? '-',
                           style: textTheme.bodySmall,
                         ),
                       ),
@@ -247,34 +264,41 @@ class TeacherTableCard extends StatelessWidget {
                           width: 150,
                           child: Wrap(
                             spacing: 4,
-                            children: teacher.classroomsInCharge
-                                .take(2)
-                                .map(
-                                  (classroom) => Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 8,
-                                      vertical: 4,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.darkRed.withAlpha(25),
-                                      borderRadius: BorderRadius.circular(4),
-                                    ),
-                                    child: Text(
-                                      classroom,
-                                      style: textTheme.bodySmall?.copyWith(
-                                        color: AppColors.darkRed,
-                                        fontSize: 10,
-                                      ),
+                            children: (() {
+                              final displayList =
+                                  (teacher.coursesAssignedNames.isNotEmpty)
+                                  ? teacher.coursesAssignedNames
+                                  : teacher.coursesAssigned;
+                              return displayList.take(2).map((course) {
+                                final display = course.toString();
+                                return Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.darkRed.withAlpha(25),
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: Text(
+                                    display.isNotEmpty ? display : '-',
+                                    style: textTheme.bodySmall?.copyWith(
+                                      color: AppColors.darkRed,
+                                      fontSize: 10,
                                     ),
                                   ),
-                                )
-                                .toList(),
+                                );
+                              }).toList();
+                            })(),
                           ),
                         ),
                       ),
                       DataCell(
                         Text(
-                          '${teacher.experienceYears} years',
+                          (teacher.experience != null &&
+                                  teacher.experience!.isNotEmpty)
+                              ? '${teacher.experience} years'
+                              : '-',
                           style: textTheme.bodySmall,
                         ),
                       ),
@@ -307,7 +331,7 @@ class TeacherTableCard extends StatelessWidget {
                                 _showDeleteConfirmation(
                                   context,
                                   teacher.id,
-                                  teacher.teacherName,
+                                  teacher.fullName ?? '-',
                                   teacherController,
                                 );
                               },
@@ -316,11 +340,11 @@ class TeacherTableCard extends StatelessWidget {
                         ),
                       ),
                     ],
-                  );
-                }),
-              ),
-            );
-          }),
+                  ); // End DataRow
+                }), // End List.generate
+              ), // End DataTable
+            ); // End SingleChildScrollView
+          }), // End Obx
         ],
       ),
     );

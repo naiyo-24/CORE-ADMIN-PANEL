@@ -1,8 +1,8 @@
+import 'package:application_admin_panel/controllers/teacher_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/side_nav_bar.dart';
-import '../../controllers/teacher_controller.dart';
 import '../../cards/teacher/teacher_table_card.dart';
 import '../../cards/teacher/onboard_edit_teacher_card.dart';
 
@@ -113,10 +113,8 @@ class TeachersScreen extends StatelessWidget {
                             Row(
                               children: [
                                 Expanded(
-                                  child: ValueListenableBuilder(
-                                    valueListenable:
-                                        teacherController.searchNameController,
-                                    builder: (context, value, child) {
+                                  child: StatefulBuilder(
+                                    builder: (context, setState) {
                                       return TextField(
                                         controller: teacherController
                                             .searchNameController,
@@ -127,7 +125,11 @@ class TeachersScreen extends StatelessWidget {
                                             Icons.search,
                                             color: AppColors.darkRed,
                                           ),
-                                          suffixIcon: value.text.isNotEmpty
+                                          suffixIcon:
+                                              teacherController
+                                                  .searchNameController
+                                                  .text
+                                                  .isNotEmpty
                                               ? IconButton(
                                                   icon: Icon(
                                                     Icons.clear,
@@ -143,6 +145,7 @@ class TeachersScreen extends StatelessWidget {
                                                           '',
                                                           '',
                                                         );
+                                                    setState(() {});
                                                   },
                                                 )
                                               : null,
@@ -170,6 +173,7 @@ class TeachersScreen extends StatelessWidget {
                                                 value,
                                                 value,
                                               );
+                                          setState(() {});
                                         },
                                       );
                                     },

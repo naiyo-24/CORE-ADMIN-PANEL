@@ -17,6 +17,18 @@ class ApiUrl {
       '/api/courses/delete-by/$courseId';
   static const String bulkDeleteCourses = '/api/courses/bulk/delete';
 
+  // Teacher endpoints
+  static const String teachersBase = '/api/teachers';
+  static const String createTeacher = '/api/teachers/create';
+  static const String getAllTeachers = '/api/teachers/get-all';
+  static String getTeacherById(String teacherId) =>
+      '/api/teachers/get-by/$teacherId';
+  static String updateTeacher(String teacherId) =>
+      '/api/teachers/put-by/$teacherId';
+  static String deleteTeacher(String teacherId) =>
+      '/api/teachers/delete-by/$teacherId';
+  static const String bulkDeleteTeachers = '/api/teachers/bulk-delete';
+
   // Student endpoints
   static const String studentsBase = '/api/students';
   static const String createStudent = '/api/students/create';

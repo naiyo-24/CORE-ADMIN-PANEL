@@ -1,131 +1,69 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../models/teacher.dart';
+import '../models/course.dart';
+import '../services/teacher_services.dart';
 
 class TeacherController extends GetxController {
+  // Delete teacher
+  Future<void> deleteTeacher(String id) async {
+    try {
+      await TeacherServices.deleteTeacher(id);
+      await fetchTeachers();
+      Get.snackbar(
+        'Success',
+        'Teacher deleted successfully!',
+        backgroundColor: const Color(0xFF4CAF50),
+        colorText: const Color(0xFFFEFEFE),
+        snackPosition: SnackPosition.TOP,
+      );
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Failed to delete teacher',
+        backgroundColor: const Color(0xFFE53935),
+        colorText: const Color(0xFFFEFEFE),
+        snackPosition: SnackPosition.TOP,
+      );
+    }
+  }
+
+  // Courses for assigning to teachers
+  final RxList<Course> courses = <Course>[].obs;
+  final RxList<String> selectedCourseIds = <String>[].obs;
+
+  // Fetch all courses for selection
+  Future<void> fetchCourses() async {
+    try {
+      final result = await TeacherServices.getAllCourses();
+      courses.value = result;
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error fetching courses: $e');
+      }
+      Get.snackbar(
+        'Error',
+        'Failed to fetch courses',
+        backgroundColor: const Color(0xFFE53935),
+        colorText: const Color(0xFFFEFEFE),
+        snackPosition: SnackPosition.TOP,
+      );
+    }
+  }
+
   // Observable state
   final RxList<Teacher> teachers = <Teacher>[].obs;
   final RxList<Teacher> filteredTeachers = <Teacher>[].obs;
   final RxBool isLoading = false.obs;
   final RxBool isCreating = false.obs;
 
+  // ...existing code...
   // Search controllers
   final searchNameController = TextEditingController();
   final searchPhoneController = TextEditingController();
-
-  @override
-  void onInit() {
-    super.onInit();
-    fetchTeachers();
-    // Listen to search changes
-    searchNameController.addListener(_filterTeachers);
-    searchPhoneController.addListener(_filterTeachers);
-  }
-
-  @override
-  void onClose() {
-    searchNameController.dispose();
-    searchPhoneController.dispose();
-    super.onClose();
-  }
-
-  // Fetch all teachers
-  Future<void> fetchTeachers() async {
-    try {
-      isLoading.value = true;
-
-      // Simulate API call
-      await Future.delayed(const Duration(seconds: 1));
-
-      // Mock data
-      teachers.value = [
-        Teacher(
-          id: 'TCH001',
-          teacherName: 'Dr. Ramesh Sharma',
-          phoneNumber: '9876543210',
-          email: 'ramesh.sharma@vwings.com',
-          alternativePhoneNumber: '9876543211',
-          address: '45 Education Lane, Delhi',
-          specialization: 'Aviation Theory',
-          classroomsInCharge: ['Room A-101', 'Room A-102'],
-          experienceYears: 15,
-          profilePhotoUrl: null,
-          password: 'password123',
-          bio:
-              'Experienced aviation instructor with 15 years of teaching excellence in theoretical aviation concepts.',
-        ),
-        Teacher(
-          id: 'TCH002',
-          teacherName: 'Capt. Meera Desai',
-          phoneNumber: '9876543220',
-          email: 'meera.desai@vwings.com',
-          alternativePhoneNumber: '9876543221',
-          address: '78 Sky Boulevard, Mumbai',
-          specialization: 'Flight Simulation',
-          classroomsInCharge: ['Simulator Bay 1', 'Simulator Bay 2'],
-          experienceYears: 12,
-          profilePhotoUrl: null,
-          password: 'password123',
-          bio:
-              'Former commercial pilot turned instructor specializing in advanced flight simulation training.',
-        ),
-        Teacher(
-          id: 'TCH003',
-          teacherName: 'Prof. Anil Kumar',
-          phoneNumber: '9876543230',
-          email: 'anil.kumar@vwings.com',
-          alternativePhoneNumber: '9876543231',
-          address: '12 Aviation Street, Bangalore',
-          specialization: 'Aircraft Maintenance',
-          classroomsInCharge: ['Workshop A', 'Room B-201'],
-          experienceYears: 20,
-          profilePhotoUrl: null,
-          password: 'password123',
-          bio:
-              'Aircraft maintenance engineer with two decades of industry and teaching experience.',
-        ),
-        Teacher(
-          id: 'TCH004',
-          teacherName: 'Ms. Priya Patel',
-          phoneNumber: '9876543240',
-          email: 'priya.patel@vwings.com',
-          alternativePhoneNumber: '9876543241',
-          address: '56 Training Center Road, Hyderabad',
-          specialization: 'Cabin Crew Training',
-          classroomsInCharge: ['Room C-101', 'Mock Cabin A'],
-          experienceYears: 8,
-          profilePhotoUrl: null,
-          password: 'password123',
-          bio:
-              'Certified cabin crew trainer with extensive experience in hospitality and safety procedures.',
-        ),
-        Teacher(
-          id: 'TCH005',
-          teacherName: 'Wg Cdr. Vikram Singh',
-          phoneNumber: '9876543250',
-          email: 'vikram.singh@vwings.com',
-          alternativePhoneNumber: '9876543251',
-          address: '89 Defense Colony, Chennai',
-          specialization: 'Navigation & Meteorology',
-          classroomsInCharge: ['Room D-101', 'Lab A'],
-          experienceYears: 18,
-          profilePhotoUrl: null,
-          password: 'password123',
-          bio:
-              'Retired Air Force officer with expertise in navigation systems and meteorological analysis.',
-        ),
-      ];
-
-      filteredTeachers.value = List.from(teachers);
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error fetching teachers: $e');
-      }
-    } finally {
-      isLoading.value = false;
-    }
-  }
 
   // Fetch all teachers (alias for fetchTeachers)
   Future<void> getAllTeachers() async {
@@ -135,60 +73,43 @@ class TeacherController extends GetxController {
   // Search by name and phone
   void searchByNameAndPhone(String name, String phone) {
     final query = name.toLowerCase();
-
     if (query.isEmpty) {
       filteredTeachers.value = List.from(teachers);
       return;
     }
-
     filteredTeachers.value = teachers.where((teacher) {
-      final nameMatch = teacher.teacherName.toLowerCase().contains(query);
-      final phoneMatch = teacher.phoneNumber.contains(query);
-
-      // Return true if either name or phone matches
+      final nameMatch = (teacher.fullName ?? '').toLowerCase().contains(query);
+      final phoneMatch = (teacher.phoneNo ?? '').contains(query);
       return nameMatch || phoneMatch;
     }).toList();
   }
 
-  // Filter teachers based on search
-  void _filterTeachers() {
-    final nameQuery = searchNameController.text.toLowerCase();
-    final phoneQuery = searchPhoneController.text;
-
-    if (nameQuery.isEmpty && phoneQuery.isEmpty) {
-      filteredTeachers.value = List.from(teachers);
-      return;
-    }
-
-    filteredTeachers.value = teachers.where((teacher) {
-      final nameMatch = teacher.teacherName.toLowerCase().contains(nameQuery);
-      final phoneMatch = teacher.phoneNumber.contains(phoneQuery);
-
-      if (nameQuery.isNotEmpty && phoneQuery.isNotEmpty) {
-        return nameMatch && phoneMatch;
-      }
-
-      if (nameQuery.isNotEmpty) {
-        return nameMatch;
-      }
-
-      if (phoneQuery.isNotEmpty) {
-        return phoneMatch;
-      }
-
-      return true;
-    }).toList();
+  @override
+  void onInit() {
+    super.onInit();
+    // Load courses and teachers when controller is initialized
+    fetchCourses();
+    fetchTeachers();
   }
 
+  // Filter teachers based on search
+
   // Add new teacher
-  Future<void> addTeacher(Teacher teacher) async {
+  Future<void> addTeacher(Teacher teacher, {String? profilePhotoPath}) async {
     try {
       isCreating.value = true;
-      await Future.delayed(const Duration(seconds: 1));
-
-      teachers.add(teacher);
-      filteredTeachers.value = List.from(teachers);
-
+      final data = teacher.toJson();
+      // Remove teacher_id for creation if present
+      data.remove('teacher_id');
+      // Convert courses_assigned to JSON string if needed
+      if (data['courses_assigned'] is! String) {
+        data['courses_assigned'] = jsonEncode(teacher.coursesAssigned);
+      }
+      await TeacherServices.createTeacher(
+        data,
+        profilePhotoPath: profilePhotoPath,
+      );
+      await fetchTeachers();
       Get.snackbar(
         'Success',
         'Teacher onboarded successfully!',
@@ -210,24 +131,31 @@ class TeacherController extends GetxController {
   }
 
   // Edit teacher
-  Future<void> editTeacher(String id, Teacher updatedTeacher) async {
+  Future<void> editTeacher(
+    String id,
+    Teacher updatedTeacher, {
+    String? profilePhotoPath,
+  }) async {
     try {
       isCreating.value = true;
-      await Future.delayed(const Duration(seconds: 1));
-
-      final index = teachers.indexWhere((t) => t.id == id);
-      if (index != -1) {
-        teachers[index] = updatedTeacher;
-        filteredTeachers.value = List.from(teachers);
-
-        Get.snackbar(
-          'Success',
-          'Teacher updated successfully!',
-          backgroundColor: const Color(0xFF4CAF50),
-          colorText: const Color(0xFFFEFEFE),
-          snackPosition: SnackPosition.TOP,
-        );
+      final data = updatedTeacher.toJson();
+      // Convert courses_assigned to JSON string if needed
+      if (data['courses_assigned'] is! String) {
+        data['courses_assigned'] = jsonEncode(updatedTeacher.coursesAssigned);
       }
+      await TeacherServices.updateTeacher(
+        id,
+        data,
+        profilePhotoPath: profilePhotoPath,
+      );
+      await fetchTeachers();
+      Get.snackbar(
+        'Success',
+        'Teacher updated successfully!',
+        backgroundColor: const Color(0xFF4CAF50),
+        colorText: const Color(0xFFFEFEFE),
+        snackPosition: SnackPosition.TOP,
+      );
     } catch (e) {
       Get.snackbar(
         'Error',
@@ -241,34 +169,26 @@ class TeacherController extends GetxController {
     }
   }
 
-  // Delete teacher
-  Future<void> deleteTeacher(String id) async {
+  // Fetch all teachers
+  Future<void> fetchTeachers() async {
     try {
-      await Future.delayed(const Duration(milliseconds: 500));
-
-      teachers.removeWhere((t) => t.id == id);
-      filteredTeachers.value = List.from(teachers);
-
-      Get.snackbar(
-        'Success',
-        'Teacher deleted successfully!',
-        backgroundColor: const Color(0xFF4CAF50),
-        colorText: const Color(0xFFFEFEFE),
-        snackPosition: SnackPosition.TOP,
-      );
+      isLoading.value = true;
+      final result = await TeacherServices.getAllTeachers();
+      teachers.value = result;
+      filteredTeachers.value = List.from(result);
     } catch (e) {
+      if (kDebugMode) {
+        print('Error fetching teachers: $e');
+      }
       Get.snackbar(
         'Error',
-        'Failed to delete teacher',
+        'Failed to fetch teachers',
         backgroundColor: const Color(0xFFE53935),
         colorText: const Color(0xFFFEFEFE),
         snackPosition: SnackPosition.TOP,
       );
+    } finally {
+      isLoading.value = false;
     }
-  }
-
-  // Refresh teachers
-  Future<void> refreshTeachers() async {
-    await fetchTeachers();
   }
 }
