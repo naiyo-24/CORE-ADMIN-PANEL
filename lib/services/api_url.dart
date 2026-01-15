@@ -40,4 +40,16 @@ class ApiUrl {
   static String deleteStudent(String studentId) =>
       '/api/students/delete-by/$studentId';
   static const String bulkDeleteStudents = '/api/students/bulk/delete';
+
+  // Counsellor endpoints
+  static const String counsellorsBase = '/api/counsellors';
+  static const String createCounsellor = '/api/counsellors/create';
+  static const String getAllCounsellors = '/api/counsellors/get-all';
+  static String getCounsellorById(String counsellorId) =>
+      '/api/counsellors/get-by/$counsellorId';
+  static String updateCounsellor(String counsellorId) =>
+      '/api/counsellors/put-by/$counsellorId';
+  static String deleteCounsellor(String counsellorId) =>
+      '/api/counsellors/delete-by/$counsellorId';
+  static const String bulkDeleteCounsellors = '/api/counsellors/bulk-delete';
 }

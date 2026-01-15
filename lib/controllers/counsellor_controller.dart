@@ -1,6 +1,8 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../models/counsellor.dart';
+import '../services/counsellor_services.dart';
 
 class CounsellorController extends GetxController {
   // Observable state
@@ -29,86 +31,9 @@ class CounsellorController extends GetxController {
   Future<void> getAllCounsellors() async {
     try {
       isLoading.value = true;
-      await Future.delayed(const Duration(seconds: 1));
-
-      counsellors.value = [
-        Counsellor(
-          id: 'CNS001',
-          name: 'Dr. Priya Verma',
-          phoneNumber: '9876543210',
-          email: 'priya.verma@vwings.com',
-          address: '78 Wellness Park, Mumbai',
-          experienceYears: 12,
-          qualification: 'M.Phil - Psychology, Ph.D - Counselling',
-          commissionPercentage: 5.5,
-          alternatePhoneNumber: '9876543211',
-          password: 'SecurePass123',
-          profilePhotoUrl: null,
-          bio:
-              'Senior counsellor with extensive experience in student mentoring and career guidance. Specialized in personality development and stress management.',
-        ),
-        Counsellor(
-          id: 'CNS002',
-          name: 'Ms. Anjali Malhotra',
-          phoneNumber: '9876543220',
-          email: 'anjali.malhotra@vwings.com',
-          address: '42 Guidance Avenue, Delhi',
-          experienceYears: 8,
-          qualification: 'M.A - Counselling Psychology',
-          commissionPercentage: 4.5,
-          alternatePhoneNumber: '9876543221',
-          password: 'SecurePass123',
-          profilePhotoUrl: null,
-          bio:
-              'Career counsellor with focus on aviation industry guidance. Helps students identify their potential and career path in aviation sector.',
-        ),
-        Counsellor(
-          id: 'CNS003',
-          name: 'Mr. Rakesh Nair',
-          phoneNumber: '9876543230',
-          email: 'rakesh.nair@vwings.com',
-          address: '56 Mentor Street, Bangalore',
-          experienceYears: 10,
-          qualification: 'M.Sc - Educational Psychology',
-          commissionPercentage: 4.0,
-          alternatePhoneNumber: '9876543231',
-          password: 'SecurePass123',
-          profilePhotoUrl: null,
-          bio:
-              'Educational counsellor specializing in academic performance improvement and study techniques for aviation programs.',
-        ),
-        Counsellor(
-          id: 'CNS004',
-          name: 'Ms. Neha Deshmukh',
-          phoneNumber: '9876543240',
-          email: 'neha.deshmukh@vwings.com',
-          address: '89 Support Lane, Pune',
-          experienceYears: 7,
-          qualification: 'M.A - Clinical Psychology, B.Ed',
-          commissionPercentage: 3.5,
-          alternatePhoneNumber: '9876543241',
-          password: 'SecurePass123',
-          profilePhotoUrl: null,
-          bio:
-              'Mental health and wellness counsellor. Provides support for personal development and emotional well-being of students.',
-        ),
-        Counsellor(
-          id: 'CNS005',
-          name: 'Dr. Arun Saxena',
-          phoneNumber: '9876543250',
-          email: 'arun.saxena@vwings.com',
-          address: '23 Advisory Drive, Hyderabad',
-          experienceYears: 15,
-          qualification: 'Ph.D - Guidance and Counselling',
-          commissionPercentage: 6.0,
-          alternatePhoneNumber: '9876543251',
-          password: 'SecurePass123',
-          profilePhotoUrl: null,
-          bio:
-              'Lead counsellor and department head. Expert in student integration and institution-wide counselling program development.',
-        ),
-      ];
-
+      final service = CounsellorService();
+      final fetched = await service.getAllCounsellors();
+      counsellors.value = fetched;
       filteredCounsellors.value = List.from(counsellors);
     } catch (e) {
       Get.snackbar(
@@ -145,21 +70,30 @@ class CounsellorController extends GetxController {
   }
 
   // Add new counsellor
-  Future<void> addCounsellor(Counsellor counsellor) async {
+  Future<void> addCounsellor(
+    Counsellor counsellor, {
+    Uint8List? profilePhotoBytes,
+    String? profilePhotoFilename,
+  }) async {
     try {
       isCreating.value = true;
-      await Future.delayed(const Duration(seconds: 1));
-
-      counsellors.add(counsellor);
-      filteredCounsellors.value = List.from(counsellors);
-
-      Get.snackbar(
-        'Success',
-        'Counsellor added successfully!',
-        backgroundColor: const Color(0xFF4CAF50),
-        colorText: const Color(0xFFFEFEFE),
-        snackPosition: SnackPosition.TOP,
+      final service = CounsellorService();
+      final created = await service.createCounsellor(
+        counsellor: counsellor,
+        profilePhotoBytes: profilePhotoBytes,
+        profilePhotoFilename: profilePhotoFilename,
       );
+      if (created != null) {
+        counsellors.add(created);
+        filteredCounsellors.value = List.from(counsellors);
+        Get.snackbar(
+          'Success',
+          'Counsellor added successfully!',
+          backgroundColor: const Color(0xFF4CAF50),
+          colorText: const Color(0xFFFEFEFE),
+          snackPosition: SnackPosition.TOP,
+        );
+      }
     } catch (e) {
       Get.snackbar(
         'Error',
@@ -174,14 +108,24 @@ class CounsellorController extends GetxController {
   }
 
   // Edit counsellor
-  Future<void> editCounsellor(String id, Counsellor updatedCounsellor) async {
+  Future<void> editCounsellor(
+    String id,
+    Counsellor updatedCounsellor, {
+    Uint8List? profilePhotoBytes,
+    String? profilePhotoFilename,
+  }) async {
     try {
       isCreating.value = true;
-      await Future.delayed(const Duration(seconds: 1));
-
+      final service = CounsellorService();
+      final updated = await service.updateCounsellor(
+        id: id,
+        fields: updatedCounsellor.toJson(),
+        profilePhotoBytes: profilePhotoBytes,
+        profilePhotoFilename: profilePhotoFilename,
+      );
       final index = counsellors.indexWhere((c) => c.id == id);
       if (index != -1) {
-        counsellors[index] = updatedCounsellor;
+        counsellors[index] = updated;
         filteredCounsellors.value = List.from(counsellors);
 
         Get.snackbar(
@@ -208,11 +152,10 @@ class CounsellorController extends GetxController {
   // Delete counsellor
   Future<void> deleteCounsellor(String id) async {
     try {
-      await Future.delayed(const Duration(milliseconds: 500));
-
+      final service = CounsellorService();
+      await service.deleteCounsellor(id);
       counsellors.removeWhere((c) => c.id == id);
       filteredCounsellors.value = List.from(counsellors);
-
       Get.snackbar(
         'Success',
         'Counsellor deleted successfully!',

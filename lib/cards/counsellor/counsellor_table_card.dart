@@ -228,7 +228,7 @@ class CounsellorTableCard extends StatelessWidget {
                         SizedBox(
                           width: 150,
                           child: Text(
-                            counsellor.address,
+                            counsellor.address ?? '-',
                             style: textTheme.bodySmall,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
@@ -245,7 +245,7 @@ class CounsellorTableCard extends StatelessWidget {
                         SizedBox(
                           width: 150,
                           child: Text(
-                            counsellor.qualification,
+                            counsellor.qualification ?? '-',
                             style: textTheme.bodySmall,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
@@ -254,7 +254,7 @@ class CounsellorTableCard extends StatelessWidget {
                       ),
                       DataCell(
                         Text(
-                          '${counsellor.commissionPercentage}%',
+                          '${counsellor.commissionPercentage.toStringAsFixed(1)}%',
                           style: textTheme.bodySmall?.copyWith(
                             color: AppColors.successGreen,
                             fontWeight: FontWeight.w600,
@@ -263,7 +263,7 @@ class CounsellorTableCard extends StatelessWidget {
                       ),
                       DataCell(
                         Text(
-                          counsellor.alternatePhoneNumber,
+                          counsellor.alternatePhoneNumber ?? '-',
                           style: textTheme.bodySmall,
                         ),
                       ),

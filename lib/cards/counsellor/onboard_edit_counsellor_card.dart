@@ -1,7 +1,10 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:get/get.dart';
 import 'package:file_picker/file_picker.dart';
+import '../../../controllers/course_controller.dart';
 import '../../../theme/app_theme.dart';
 import '../../../controllers/counsellor_controller.dart';
 import '../../../models/counsellor.dart';
@@ -27,16 +30,34 @@ class _OnboardEditCounsellorCardState extends State<OnboardEditCounsellorCard> {
   late final TextEditingController _experienceController;
   late final TextEditingController _qualificationController;
   late final TextEditingController _commissionController;
+  late final TextEditingController _bankAccNoController;
+  late final TextEditingController _bankAccNameController;
+  late final TextEditingController _branchNameController;
+  late final TextEditingController _ifscController;
+  late final TextEditingController _upiController;
+  // removed raw JSON per-course controller
+  late final TextEditingController _perCoursePercentController;
   late final TextEditingController _altPhoneController;
   late final TextEditingController _passwordController;
-  late final TextEditingController _bioController;
+  // bio removed
 
   String? _selectedProfilePhoto;
   String? _profilePhotoDisplayName;
+  Uint8List? _profilePhotoBytes;
+  String? _profilePhotoFilename;
+  // per-course commission map: courseId -> percentage
+  final Map<String, double> _perCoursesMap = {};
+  String? _selectedCourseId;
+  CourseController? _courseController;
 
   @override
   void initState() {
     super.initState();
+    try {
+      _courseController = Get.find<CourseController>();
+    } catch (_) {
+      _courseController = Get.put(CourseController());
+    }
     _nameController = TextEditingController(
       text: widget.counsellor?.name ?? '',
     );
@@ -58,17 +79,38 @@ class _OnboardEditCounsellorCardState extends State<OnboardEditCounsellorCard> {
     _commissionController = TextEditingController(
       text: widget.counsellor?.commissionPercentage.toString() ?? '',
     );
+    _bankAccNoController = TextEditingController(
+      text: widget.counsellor?.bankAccountNo ?? '',
+    );
+    _bankAccNameController = TextEditingController(
+      text: widget.counsellor?.bankAccountName ?? '',
+    );
+    _branchNameController = TextEditingController(
+      text: widget.counsellor?.branchName ?? '',
+    );
+    _ifscController = TextEditingController(
+      text: widget.counsellor?.ifscCode ?? '',
+    );
+    _upiController = TextEditingController(
+      text: widget.counsellor?.upiId ?? '',
+    );
+    _perCoursePercentController = TextEditingController();
     _altPhoneController = TextEditingController(
       text: widget.counsellor?.alternatePhoneNumber ?? '',
     );
     _passwordController = TextEditingController(
       text: widget.counsellor?.password ?? '',
     );
-    _bioController = TextEditingController(text: widget.counsellor?.bio ?? '');
+    // bio removed
 
     if (widget.counsellor?.profilePhotoUrl != null) {
       _selectedProfilePhoto = widget.counsellor!.profilePhotoUrl;
       _profilePhotoDisplayName = 'Current Photo';
+    }
+
+    // initialize per-course map from existing counsellor
+    if (widget.counsellor?.perCoursesCommission != null) {
+      _perCoursesMap.addAll(widget.counsellor!.perCoursesCommission!);
     }
   }
 
@@ -81,9 +123,15 @@ class _OnboardEditCounsellorCardState extends State<OnboardEditCounsellorCard> {
     _experienceController.dispose();
     _qualificationController.dispose();
     _commissionController.dispose();
+    _bankAccNoController.dispose();
+    _bankAccNameController.dispose();
+    _branchNameController.dispose();
+    _ifscController.dispose();
+    _upiController.dispose();
+    _perCoursePercentController.dispose();
     _altPhoneController.dispose();
     _passwordController.dispose();
-    _bioController.dispose();
+    // bio removed
     super.dispose();
   }
 
@@ -99,9 +147,13 @@ class _OnboardEditCounsellorCardState extends State<OnboardEditCounsellorCard> {
           if (kIsWeb) {
             _selectedProfilePhoto = result.files.single.name;
             _profilePhotoDisplayName = result.files.single.name;
+            _profilePhotoBytes = result.files.single.bytes;
+            _profilePhotoFilename = result.files.single.name;
           } else {
             _selectedProfilePhoto = result.files.single.path;
             _profilePhotoDisplayName = result.files.single.name;
+            _profilePhotoBytes = result.files.single.bytes;
+            _profilePhotoFilename = result.files.single.name;
           }
         });
       }
@@ -130,13 +182,30 @@ class _OnboardEditCounsellorCardState extends State<OnboardEditCounsellorCard> {
         alternatePhoneNumber: _altPhoneController.text.trim(),
         password: _passwordController.text.trim(),
         profilePhotoUrl: _selectedProfilePhoto,
-        bio: _bioController.text.trim(),
+        // bio removed
+        bankAccountNo: _bankAccNoController.text.trim(),
+        bankAccountName: _bankAccNameController.text.trim(),
+        branchName: _branchNameController.text.trim(),
+        ifscCode: _ifscController.text.trim(),
+        upiId: _upiController.text.trim(),
+        perCoursesCommission: _perCoursesMap.isNotEmpty
+            ? Map.from(_perCoursesMap)
+            : null,
       );
 
       if (widget.counsellor == null) {
-        counsellorController.addCounsellor(counsellor);
+        counsellorController.addCounsellor(
+          counsellor,
+          profilePhotoBytes: _profilePhotoBytes,
+          profilePhotoFilename: _profilePhotoFilename,
+        );
       } else {
-        counsellorController.editCounsellor(widget.counsellor!.id, counsellor);
+        counsellorController.editCounsellor(
+          widget.counsellor!.id,
+          counsellor,
+          profilePhotoBytes: _profilePhotoBytes,
+          profilePhotoFilename: _profilePhotoFilename,
+        );
       }
 
       Navigator.pop(context);
@@ -277,13 +346,131 @@ class _OnboardEditCounsellorCardState extends State<OnboardEditCounsellorCard> {
                       const SizedBox(height: 32),
                       _buildSectionTitle('Additional Information', textTheme),
                       const SizedBox(height: 16),
-                      _buildTextField(
-                        controller: _bioController,
-                        label: 'Bio *',
-                        maxLines: 4,
-                        hint: 'Write a brief bio about the counsellor...',
-                        validator: (val) => val!.isEmpty ? 'Required' : null,
-                      ),
+                      // Per-course commissions
+                      _buildSectionTitle('Per-Course Commissions', textTheme),
+                      const SizedBox(height: 12),
+                      Obx(() {
+                        final courses =
+                            _courseController?.courses ?? <dynamic>[];
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: DropdownButtonFormField<String>(
+                                    value: _selectedCourseId,
+                                    items: courses
+                                        .map<DropdownMenuItem<String>>((c) {
+                                          final id =
+                                              (c as dynamic).id as String;
+                                          final name =
+                                              (c as dynamic).name as String;
+                                          return DropdownMenuItem(
+                                            value: id,
+                                            child: Text(name),
+                                          );
+                                        })
+                                        .toList(),
+                                    onChanged: (v) =>
+                                        setState(() => _selectedCourseId = v),
+                                    decoration: InputDecoration(
+                                      labelText: 'Select Course',
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                SizedBox(
+                                  width: 140,
+                                  child: _buildTextField(
+                                    controller: _perCoursePercentController,
+                                    label: 'Commission %',
+                                    keyboardType:
+                                        const TextInputType.numberWithOptions(
+                                          decimal: true,
+                                        ),
+                                    validator: (val) {
+                                      if (val == null || val.isEmpty)
+                                        return 'Required';
+                                      if (double.tryParse(val) == null)
+                                        return 'Invalid';
+                                      return null;
+                                    },
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    if (_selectedCourseId == null) {
+                                      Get.snackbar(
+                                        'Error',
+                                        'Select a course',
+                                        snackPosition: SnackPosition.TOP,
+                                      );
+                                      return;
+                                    }
+                                    final val = double.tryParse(
+                                      _perCoursePercentController.text.trim(),
+                                    );
+                                    if (val == null) {
+                                      Get.snackbar(
+                                        'Error',
+                                        'Enter valid percentage',
+                                        snackPosition: SnackPosition.TOP,
+                                      );
+                                      return;
+                                    }
+                                    setState(() {
+                                      _perCoursesMap[_selectedCourseId!] = val;
+                                      _perCoursePercentController.clear();
+                                      _selectedCourseId = null;
+                                    });
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColors.darkRed,
+                                  ),
+                                  child: const Text('Add'),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+                            if (_perCoursesMap.isNotEmpty)
+                              Column(
+                                children: _perCoursesMap.entries.map((e) {
+                                  dynamic course;
+                                  try {
+                                    course = _courseController?.courses
+                                        .firstWhere(
+                                          (c) => (c as dynamic).id == e.key,
+                                        );
+                                  } catch (_) {
+                                    course = null;
+                                  }
+                                  final courseName = course != null
+                                      ? (course as dynamic).name as String
+                                      : e.key;
+                                  return ListTile(
+                                    contentPadding: EdgeInsets.zero,
+                                    title: Text(courseName),
+                                    subtitle: Text('${e.value}%'),
+                                    trailing: IconButton(
+                                      icon: const Icon(
+                                        Icons.delete,
+                                        color: Colors.red,
+                                      ),
+                                      onPressed: () => setState(
+                                        () => _perCoursesMap.remove(e.key),
+                                      ),
+                                    ),
+                                  );
+                                }).toList(),
+                              ),
+                          ],
+                        );
+                      }),
                       const SizedBox(height: 16),
                       _buildTwoColumnLayout(
                         isDesktop,
