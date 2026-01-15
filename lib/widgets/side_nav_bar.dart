@@ -86,148 +86,246 @@ class SideNavBar extends StatelessWidget {
       },
     ];
 
-    if (isMobile) {
-      return const SizedBox.shrink();
-    }
+    if (isMobile) return const SizedBox.shrink();
 
     return Container(
       width: width,
       height: MediaQuery.of(context).size.height,
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        border: Border(
-          right: BorderSide(color: AppColors.borderGray, width: 1.5),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.shadowBlack,
-            blurRadius: 10,
-            offset: const Offset(4, 0),
-          ),
-        ],
-      ),
+      color: AppColors.white,
       child: SafeArea(
-        child: Column(
+        child: Stack(
           children: [
-            // Header with Logo and Company Name
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 6),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Logo
-                  SizedBox(
-                    width: 60,
-                    height: 60,
-
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: Image.asset(
-                        'assets/logo/logo.png',
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Container(
-                            color: AppColors.darkRed,
-                            child: const Icon(
-                              Icons.flight,
-                              size: 32,
-                              color: AppColors.white,
-                            ),
-                          );
-                        },
-                      ),
-                    ),
+            // Slim left accent bar
+            Positioned(
+              left: 0,
+              top: 0,
+              bottom: 0,
+              child: Container(
+                width: 6,
+                decoration: BoxDecoration(
+                  borderRadius: const BorderRadius.only(
+                    topRight: Radius.circular(10),
+                    bottomRight: Radius.circular(10),
                   ),
-                  const SizedBox(height: 16),
-                  // Company Name
-                  Text(
-                    'VWings24x7',
-                    style: textTheme.headlineMedium?.copyWith(
-                      color: AppColors.darkRed,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 0.8,
-                    ),
+                  gradient: LinearGradient(
+                    colors: [AppColors.darkRed, AppColors.mediumRed],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Admin Panel',
-                    style: textTheme.bodySmall?.copyWith(
-                      color: AppColors.darkGrayLight,
-                      fontWeight: FontWeight.w500,
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.shadowBlack,
+                      blurRadius: 12,
+                      offset: const Offset(2, 0),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
 
-            Divider(color: AppColors.borderGray, height: 1, thickness: 1),
-
-            // Navigation Items
-            Expanded(
-              child: ListView.separated(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                itemCount: navItems.length,
-                separatorBuilder: (context, index) => const SizedBox(height: 4),
-                itemBuilder: (context, index) {
-                  final item = navItems[index];
-                  final isActive = currentIndex == item['index'];
-
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    child: TextButton(
-                      onPressed: () {
-                        if (item['route'] != '') {
-                          Get.offNamed(item['route'] as String);
-                        }
-                      },
-                      style: AppTheme.navBarItemStyle(
-                        context,
-                        isActive: isActive,
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            item['icon'] as IconData,
-                            size: 18,
-                            color: isActive
-                                ? AppColors.darkRed
-                                : AppColors.darkGrayLight,
+            // Content
+            Padding(
+              padding: const EdgeInsets.only(left: 18.0, right: 12.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 18),
+                  // Logo row with badge
+                  Row(
+                    children: [
+                      Container(
+                        width: 56,
+                        height: 56,
+                        decoration: BoxDecoration(
+                          color: AppColors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.shadowBlack,
+                              blurRadius: 8,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.asset(
+                            'assets/logo/logo.png',
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return const Center(
+                                child: Icon(
+                                  Icons.flight,
+                                  color: AppColors.white,
+                                  size: 28,
+                                ),
+                              );
+                            },
                           ),
-                          const SizedBox(width: 12),
-                          Expanded(
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'VWings24x7',
+                            style: textTheme.headlineMedium?.copyWith(
+                              color: AppColors.darkGray,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 0.6,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.mediumRed.withAlpha(45),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
                             child: Text(
-                              item['label'] as String,
-                              style: textTheme.bodyLarge?.copyWith(
-                                color: isActive
-                                    ? AppColors.darkRed
-                                    : AppColors.darkGrayLight,
-                                fontWeight: isActive
-                                    ? FontWeight.w700
-                                    : FontWeight.w500,
+                              'Admin',
+                              style: textTheme.bodySmall?.copyWith(
+                                color: AppColors.darkRed,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: 0.6,
                               ),
-                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ],
                       ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  // Navigation
+                  Expanded(
+                    child: ListView.separated(
+                      padding: const EdgeInsets.only(top: 8, bottom: 12),
+                      itemCount: navItems.length,
+                      separatorBuilder: (context, index) =>
+                          const SizedBox(height: 6),
+                      itemBuilder: (context, index) {
+                        final item = navItems[index];
+                        final isActive = currentIndex == item['index'];
+
+                        return MouseRegion(
+                          cursor: SystemMouseCursors.click,
+                          child: GestureDetector(
+                            onTap: () {
+                              if (item['route'] != '') {
+                                Get.offNamed(item['route'] as String);
+                              }
+                            },
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 220),
+                              curve: Curves.easeInOut,
+                              height: AppTheme.navBarItemHeight(context),
+                              padding: AppTheme.navBarItemPadding(context),
+                              decoration: BoxDecoration(
+                                color: isActive
+                                    ? AppColors.darkRed.withAlpha(25)
+                                    : Colors.transparent,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Row(
+                                children: [
+                                  // Icon with circular background when active
+                                  AnimatedContainer(
+                                    duration: const Duration(milliseconds: 200),
+                                    width: 40,
+                                    height: 40,
+                                    decoration: BoxDecoration(
+                                      color: isActive
+                                          ? AppColors.darkRed
+                                          : AppColors.lightGray,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Center(
+                                      child: Icon(
+                                        item['icon'] as IconData,
+                                        size: 18,
+                                        color: isActive
+                                            ? AppColors.white
+                                            : AppColors.darkGray,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Text(
+                                      item['label'] as String,
+                                      style: textTheme.bodyLarge?.copyWith(
+                                        color: isActive
+                                            ? AppColors.darkRed
+                                            : AppColors.darkGray,
+                                        fontWeight: isActive
+                                            ? FontWeight.w800
+                                            : FontWeight.w600,
+                                        letterSpacing: 0.4,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  // subtle chevron for active
+                                  AnimatedOpacity(
+                                    duration: const Duration(milliseconds: 200),
+                                    opacity: isActive ? 1 : 0,
+                                    child: Icon(
+                                      FontAwesomeIcons.angleRight,
+                                      size: 14,
+                                      color: AppColors.darkRed,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      },
                     ),
-                  );
-                },
-              ),
-            ),
+                  ),
 
-            Divider(color: AppColors.borderGray, height: 1, thickness: 1),
-
-            // Logout Button
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: TextButton.icon(
-                onPressed: () {
-                  Get.find<AuthController>().logout();
-                },
-                style: AppTheme.navBarItemStyle(context, isActive: false),
-                icon: const Icon(FontAwesomeIcons.rightFromBracket, size: 18),
-                label: const Text('Logout'),
+                  // Logout
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 18.0),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        onPressed: () => Get.find<AuthController>().logout(),
+                        icon: const Icon(
+                          FontAwesomeIcons.rightFromBracket,
+                          size: 16,
+                        ),
+                        label: Text(
+                          'Logout',
+                          style: textTheme.bodyLarge?.copyWith(
+                            color: AppColors.darkRed,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        style: OutlinedButton.styleFrom(
+                          backgroundColor: AppColors.white,
+                          side: BorderSide(
+                            color: AppColors.darkRed.withAlpha(60),
+                            width: 1.2,
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 12,
+                            horizontal: 12,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
