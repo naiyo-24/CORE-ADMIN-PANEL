@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../theme/app_theme.dart';
 import '../../../controllers/counsellor_controller.dart';
+import '../../controllers/course_controller.dart';
 import 'onboard_edit_counsellor_card.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -253,12 +254,61 @@ class CounsellorTableCard extends StatelessWidget {
                         ),
                       ),
                       DataCell(
-                        Text(
-                          '${counsellor.commissionPercentage.toStringAsFixed(1)}%',
-                          style: textTheme.bodySmall?.copyWith(
-                            color: AppColors.successGreen,
-                            fontWeight: FontWeight.w600,
-                          ),
+                        Builder(
+                          builder: (context) {
+                            // Try to resolve course names from CourseController
+                            CourseController? courseController;
+                            try {
+                              courseController = Get.find<CourseController>();
+                            } catch (_) {
+                              courseController = null;
+                            }
+
+                            final perMap =
+                                counsellor.perCoursesCommission ?? {};
+                            if (perMap.isEmpty) {
+                              return Text(
+                                '${counsellor.commissionPercentage.toStringAsFixed(1)}%',
+                                style: textTheme.bodySmall?.copyWith(
+                                  color: AppColors.successGreen,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              );
+                            }
+
+                            final entries = perMap.entries.map((e) {
+                              String name = e.key;
+                              try {
+                                final courses =
+                                    courseController?.courses as List?;
+                                if (courses != null) {
+                                  final found = courses.firstWhere(
+                                    (c) => (c as dynamic).id == e.key,
+                                    orElse: () => null,
+                                  );
+                                  if (found != null) {
+                                    name = (found as dynamic).name as String;
+                                  }
+                                }
+                              } catch (_) {}
+                              return '$name: ${e.value.toStringAsFixed(1)}%';
+                            }).toList();
+
+                            final short = entries.length > 2
+                                ? '${entries.sublist(0, 2).join(', ')}...'
+                                : entries.join(', ');
+
+                            return Tooltip(
+                              message: entries.join('\n'),
+                              child: Text(
+                                short,
+                                style: textTheme.bodySmall?.copyWith(
+                                  color: AppColors.successGreen,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            );
+                          },
                         ),
                       ),
                       DataCell(

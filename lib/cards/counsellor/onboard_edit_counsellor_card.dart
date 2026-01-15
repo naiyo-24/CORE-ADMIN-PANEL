@@ -29,7 +29,7 @@ class _OnboardEditCounsellorCardState extends State<OnboardEditCounsellorCard> {
   late final TextEditingController _addressController;
   late final TextEditingController _experienceController;
   late final TextEditingController _qualificationController;
-  late final TextEditingController _commissionController;
+  // commission percentage input removed; commission computed from per-course map
   late final TextEditingController _bankAccNoController;
   late final TextEditingController _bankAccNameController;
   late final TextEditingController _branchNameController;
@@ -76,9 +76,7 @@ class _OnboardEditCounsellorCardState extends State<OnboardEditCounsellorCard> {
     _qualificationController = TextEditingController(
       text: widget.counsellor?.qualification ?? '',
     );
-    _commissionController = TextEditingController(
-      text: widget.counsellor?.commissionPercentage.toString() ?? '',
-    );
+    // commission controller removed
     _bankAccNoController = TextEditingController(
       text: widget.counsellor?.bankAccountNo ?? '',
     );
@@ -122,7 +120,7 @@ class _OnboardEditCounsellorCardState extends State<OnboardEditCounsellorCard> {
     _addressController.dispose();
     _experienceController.dispose();
     _qualificationController.dispose();
-    _commissionController.dispose();
+    // commission controller removed
     _bankAccNoController.dispose();
     _bankAccNameController.dispose();
     _branchNameController.dispose();
@@ -177,8 +175,10 @@ class _OnboardEditCounsellorCardState extends State<OnboardEditCounsellorCard> {
         address: _addressController.text.trim(),
         experienceYears: int.tryParse(_experienceController.text.trim()) ?? 0,
         qualification: _qualificationController.text.trim(),
-        commissionPercentage:
-            double.tryParse(_commissionController.text.trim()) ?? 0.0,
+        commissionPercentage: _perCoursesMap.isNotEmpty
+            ? (_perCoursesMap.values.reduce((a, b) => a + b) /
+                  _perCoursesMap.length)
+            : (widget.counsellor?.commissionPercentage ?? 0.0),
         alternatePhoneNumber: _altPhoneController.text.trim(),
         password: _passwordController.text.trim(),
         profilePhotoUrl: _selectedProfilePhoto,
@@ -321,20 +321,8 @@ class _OnboardEditCounsellorCardState extends State<OnboardEditCounsellorCard> {
                             return null;
                           },
                         ),
-                        _buildTextField(
-                          controller: _commissionController,
-                          label: 'Commission Percentage *',
-                          keyboardType: const TextInputType.numberWithOptions(
-                            decimal: true,
-                          ),
-                          validator: (val) {
-                            if (val!.isEmpty) return 'Required';
-                            if (double.tryParse(val) == null) {
-                              return 'Enter valid number';
-                            }
-                            return null;
-                          },
-                        ),
+                        // Commission percentage is now managed per-course; removed single input
+                        SizedBox.shrink(),
                       ),
                       const SizedBox(height: 16),
                       _buildTextField(
@@ -344,8 +332,7 @@ class _OnboardEditCounsellorCardState extends State<OnboardEditCounsellorCard> {
                         validator: (val) => val!.isEmpty ? 'Required' : null,
                       ),
                       const SizedBox(height: 32),
-                      _buildSectionTitle('Additional Information', textTheme),
-                      const SizedBox(height: 16),
+
                       // Per-course commissions
                       _buildSectionTitle('Per-Course Commissions', textTheme),
                       const SizedBox(height: 12),
@@ -393,10 +380,12 @@ class _OnboardEditCounsellorCardState extends State<OnboardEditCounsellorCard> {
                                           decimal: true,
                                         ),
                                     validator: (val) {
-                                      if (val == null || val.isEmpty)
+                                      if (val == null || val.isEmpty) {
                                         return 'Required';
-                                      if (double.tryParse(val) == null)
+                                      }
+                                      if (double.tryParse(val) == null) {
                                         return 'Invalid';
+                                      }
                                       return null;
                                     },
                                   ),
@@ -471,6 +460,37 @@ class _OnboardEditCounsellorCardState extends State<OnboardEditCounsellorCard> {
                           ],
                         );
                       }),
+                      const SizedBox(height: 16),
+                      // Bank / Payment details
+                      const SizedBox(height: 12),
+                      _buildTwoColumnLayout(
+                        isDesktop,
+                        _buildTextField(
+                          controller: _bankAccNoController,
+                          label: 'Bank Account No',
+                        ),
+                        _buildTextField(
+                          controller: _bankAccNameController,
+                          label: 'Bank Account Name',
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      _buildTwoColumnLayout(
+                        isDesktop,
+                        _buildTextField(
+                          controller: _branchNameController,
+                          label: 'Branch Name',
+                        ),
+                        _buildTextField(
+                          controller: _ifscController,
+                          label: 'IFSC Code',
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      _buildTextField(
+                        controller: _upiController,
+                        label: 'UPI ID',
+                      ),
                       const SizedBox(height: 16),
                       _buildTwoColumnLayout(
                         isDesktop,
