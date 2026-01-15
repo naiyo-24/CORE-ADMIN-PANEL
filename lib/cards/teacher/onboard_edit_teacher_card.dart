@@ -54,6 +54,7 @@ class _OnboardEditTeacherCardState extends State<OnboardEditTeacherCard> {
   String? _selectedProfilePhoto;
   String? _profilePhotoDisplayName;
   Uint8List? _selectedProfilePhotoBytes;
+  bool _pickedNewPhoto = false;
 
   @override
   void initState() {
@@ -141,9 +142,11 @@ class _OnboardEditTeacherCardState extends State<OnboardEditTeacherCard> {
             _selectedProfilePhoto = null;
             _selectedProfilePhotoBytes = result.files.single.bytes;
             _profilePhotoDisplayName = result.files.single.name;
+            _pickedNewPhoto = true;
           } else {
             _selectedProfilePhoto = result.files.single.path;
             _profilePhotoDisplayName = result.files.single.name;
+            _pickedNewPhoto = true;
           }
         });
       }
@@ -184,17 +187,25 @@ class _OnboardEditTeacherCardState extends State<OnboardEditTeacherCard> {
       if (widget.teacher == null) {
         teacherController.addTeacher(
           teacher,
-          profilePhotoPath: _selectedProfilePhoto,
-          profilePhotoBytes: _selectedProfilePhotoBytes,
-          profilePhotoFilename: _profilePhotoDisplayName,
+          profilePhotoPath: _pickedNewPhoto ? _selectedProfilePhoto : null,
+          profilePhotoBytes: _pickedNewPhoto
+              ? _selectedProfilePhotoBytes
+              : null,
+          profilePhotoFilename: _pickedNewPhoto
+              ? _profilePhotoDisplayName
+              : null,
         );
       } else {
         teacherController.editTeacher(
           widget.teacher!.id,
           teacher,
-          profilePhotoPath: _selectedProfilePhoto,
-          profilePhotoBytes: _selectedProfilePhotoBytes,
-          profilePhotoFilename: _profilePhotoDisplayName,
+          profilePhotoPath: _pickedNewPhoto ? _selectedProfilePhoto : null,
+          profilePhotoBytes: _pickedNewPhoto
+              ? _selectedProfilePhotoBytes
+              : null,
+          profilePhotoFilename: _pickedNewPhoto
+              ? _profilePhotoDisplayName
+              : null,
         );
       }
 
