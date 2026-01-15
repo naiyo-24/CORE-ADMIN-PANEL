@@ -51,6 +51,9 @@ dependencies:
   # Website URL Launcher
   url_launcher: ^6.3.2
 
+  # HTTP parser for multipart requests
+  http_parser: ^4.1.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
