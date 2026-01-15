@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'dart:typed_data';
 import 'package:get/get.dart';
 import 'package:file_picker/file_picker.dart';
 import '../../../theme/app_theme.dart';
@@ -52,6 +53,7 @@ class _OnboardEditTeacherCardState extends State<OnboardEditTeacherCard> {
 
   String? _selectedProfilePhoto;
   String? _profilePhotoDisplayName;
+  Uint8List? _selectedProfilePhotoBytes;
 
   @override
   void initState() {
@@ -136,7 +138,8 @@ class _OnboardEditTeacherCardState extends State<OnboardEditTeacherCard> {
       if (result != null) {
         setState(() {
           if (kIsWeb) {
-            _selectedProfilePhoto = result.files.single.name;
+            _selectedProfilePhoto = null;
+            _selectedProfilePhotoBytes = result.files.single.bytes;
             _profilePhotoDisplayName = result.files.single.name;
           } else {
             _selectedProfilePhoto = result.files.single.path;
@@ -182,12 +185,16 @@ class _OnboardEditTeacherCardState extends State<OnboardEditTeacherCard> {
         teacherController.addTeacher(
           teacher,
           profilePhotoPath: _selectedProfilePhoto,
+          profilePhotoBytes: _selectedProfilePhotoBytes,
+          profilePhotoFilename: _profilePhotoDisplayName,
         );
       } else {
         teacherController.editTeacher(
           widget.teacher!.id,
           teacher,
           profilePhotoPath: _selectedProfilePhoto,
+          profilePhotoBytes: _selectedProfilePhotoBytes,
+          profilePhotoFilename: _profilePhotoDisplayName,
         );
       }
 

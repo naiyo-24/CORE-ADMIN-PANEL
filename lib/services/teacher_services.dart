@@ -1,4 +1,6 @@
+import 'dart:typed_data';
 import 'package:dio/dio.dart';
+import 'package:http_parser/http_parser.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import '../models/course.dart';
 import '../models/teacher.dart';
@@ -24,15 +26,28 @@ class TeacherServices {
   static Future<Teacher> createTeacher(
     Map<String, dynamic> data, {
     String? profilePhotoPath,
+    Uint8List? profilePhotoBytes,
+    String? profilePhotoFilename,
   }) async {
     final formData = FormData.fromMap(data);
-    if (profilePhotoPath != null && profilePhotoPath.isNotEmpty) {
+    if (profilePhotoBytes != null && profilePhotoBytes.isNotEmpty) {
+      formData.files.add(
+        MapEntry(
+          'profile_photo',
+          MultipartFile.fromBytes(
+            profilePhotoBytes,
+            filename: profilePhotoFilename ?? 'profile.jpg',
+            contentType: MediaType('image', 'jpeg'),
+          ),
+        ),
+      );
+    } else if (profilePhotoPath != null && profilePhotoPath.isNotEmpty) {
       formData.files.add(
         MapEntry(
           'profile_photo',
           await MultipartFile.fromFile(
             profilePhotoPath,
-            filename: 'profile.jpg',
+            filename: profilePhotoFilename ?? 'profile.jpg',
           ),
         ),
       );
@@ -64,15 +79,28 @@ class TeacherServices {
     String teacherId,
     Map<String, dynamic> data, {
     String? profilePhotoPath,
+    Uint8List? profilePhotoBytes,
+    String? profilePhotoFilename,
   }) async {
     final formData = FormData.fromMap(data);
-    if (profilePhotoPath != null && profilePhotoPath.isNotEmpty) {
+    if (profilePhotoBytes != null && profilePhotoBytes.isNotEmpty) {
+      formData.files.add(
+        MapEntry(
+          'profile_photo',
+          MultipartFile.fromBytes(
+            profilePhotoBytes,
+            filename: profilePhotoFilename ?? 'profile.jpg',
+            contentType: MediaType('image', 'jpeg'),
+          ),
+        ),
+      );
+    } else if (profilePhotoPath != null && profilePhotoPath.isNotEmpty) {
       formData.files.add(
         MapEntry(
           'profile_photo',
           await MultipartFile.fromFile(
             profilePhotoPath,
-            filename: 'profile.jpg',
+            filename: profilePhotoFilename ?? 'profile.jpg',
           ),
         ),
       );

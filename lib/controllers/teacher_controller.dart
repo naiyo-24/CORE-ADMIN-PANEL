@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -95,7 +96,12 @@ class TeacherController extends GetxController {
   // Filter teachers based on search
 
   // Add new teacher
-  Future<void> addTeacher(Teacher teacher, {String? profilePhotoPath}) async {
+  Future<void> addTeacher(
+    Teacher teacher, {
+    String? profilePhotoPath,
+    Uint8List? profilePhotoBytes,
+    String? profilePhotoFilename,
+  }) async {
     try {
       isCreating.value = true;
       final data = teacher.toJson();
@@ -108,6 +114,8 @@ class TeacherController extends GetxController {
       await TeacherServices.createTeacher(
         data,
         profilePhotoPath: profilePhotoPath,
+        profilePhotoBytes: profilePhotoBytes,
+        profilePhotoFilename: profilePhotoFilename,
       );
       await fetchTeachers();
       Get.snackbar(
@@ -135,6 +143,8 @@ class TeacherController extends GetxController {
     String id,
     Teacher updatedTeacher, {
     String? profilePhotoPath,
+    Uint8List? profilePhotoBytes,
+    String? profilePhotoFilename,
   }) async {
     try {
       isCreating.value = true;
@@ -147,6 +157,8 @@ class TeacherController extends GetxController {
         id,
         data,
         profilePhotoPath: profilePhotoPath,
+        profilePhotoBytes: profilePhotoBytes,
+        profilePhotoFilename: profilePhotoFilename,
       );
       await fetchTeachers();
       Get.snackbar(
