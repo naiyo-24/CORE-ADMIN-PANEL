@@ -9,15 +9,12 @@ class ClassroomCard extends StatelessWidget {
   final ClassroomCallback onEdit;
   final ClassroomCallback onDelete;
   final ClassroomCallback onPushContent;
-  final ClassroomCallback onViewDetails;
-
   const ClassroomCard({
     super.key,
     required this.classroom,
     required this.onEdit,
     required this.onDelete,
     required this.onPushContent,
-    required this.onViewDetails,
   });
 
   @override
@@ -79,11 +76,7 @@ class ClassroomCard extends StatelessWidget {
                         icon: const Icon(Icons.upload_file, size: 16),
                         label: const Text('Push Content'),
                       ),
-                      const SizedBox(width: 8),
-                      TextButton(
-                        onPressed: () => onViewDetails(classroom),
-                        child: const Text('View Details'),
-                      ),
+                      // View Details removed
                     ],
                   ),
                 ],

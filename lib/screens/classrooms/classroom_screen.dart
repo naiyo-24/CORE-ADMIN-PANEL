@@ -7,7 +7,6 @@ import '../../models/classroom.dart';
 import '../../cards/classroom/classroom_card.dart';
 import '../../cards/classroom/create_edit_classroom_card.dart';
 import '../../cards/classroom/push_content_card.dart';
-import '../../cards/classroom/classroom_details_card.dart';
 
 class ClassroomScreen extends StatelessWidget {
   const ClassroomScreen({super.key});
@@ -235,17 +234,7 @@ class ClassroomScreen extends StatelessWidget {
                                         ),
                                       );
                                     },
-                                    onViewDetails: (cl) {
-                                      controller.select(cl);
-                                      showDialog(
-                                        context: context,
-                                        builder: (_) => Dialog(
-                                          child: ClassroomDetailsCard(
-                                            classroom: cl,
-                                          ),
-                                        ),
-                                      );
-                                    },
+                                    // `onViewDetails` removed — details dialog disabled.
                                   );
                                 },
                               );

@@ -4,7 +4,7 @@ import '../models/classroom.dart';
 class ClassroomController extends GetxController {
   final _classrooms = <Classroom>[].obs;
   final _filtered = <Classroom>[].obs;
-  final selected = Rxn<Classroom>();
+  // `selected` and `select()` removed — View Details feature disabled.
 
   List<Classroom> get classrooms => _classrooms;
   List<Classroom> get filtered => _filtered;
@@ -70,10 +70,6 @@ class ClassroomController extends GetxController {
       _classrooms[idx].contents.insert(0, content);
       _classrooms.refresh();
     }
-  }
-
-  void select(Classroom c) {
-    selected.value = c;
   }
 
   void removeMember(String classroomId, String member) {
