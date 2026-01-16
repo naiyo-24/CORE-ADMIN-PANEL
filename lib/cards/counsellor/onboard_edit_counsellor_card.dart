@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:application_admin_panel/widgets/snackber_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:get/get.dart';
@@ -156,7 +157,7 @@ class _OnboardEditCounsellorCardState extends State<OnboardEditCounsellorCard> {
         });
       }
     } catch (e) {
-      Get.snackbar(
+      safeSnackbar(
         'Error',
         'Failed to pick profile photo: $e',
         backgroundColor: AppColors.errorRed,
@@ -394,7 +395,7 @@ class _OnboardEditCounsellorCardState extends State<OnboardEditCounsellorCard> {
                                 ElevatedButton(
                                   onPressed: () {
                                     if (_selectedCourseId == null) {
-                                      Get.snackbar(
+                                      safeSnackbar(
                                         'Error',
                                         'Select a course',
                                         snackPosition: SnackPosition.TOP,
@@ -405,7 +406,7 @@ class _OnboardEditCounsellorCardState extends State<OnboardEditCounsellorCard> {
                                       _perCoursePercentController.text.trim(),
                                     );
                                     if (val == null) {
-                                      Get.snackbar(
+                                      safeSnackbar(
                                         'Error',
                                         'Enter valid percentage',
                                         snackPosition: SnackPosition.TOP,

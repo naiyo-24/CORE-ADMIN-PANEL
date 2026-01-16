@@ -52,7 +52,7 @@ class SideNavBar extends StatelessWidget {
         'index': 5,
         'label': 'Classroom Management',
         'icon': FontAwesomeIcons.chalkboard,
-        'route': '',
+        'route': AppRoutes.classrooms,
       },
       {
         'index': 6,

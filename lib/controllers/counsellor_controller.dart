@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:application_admin_panel/widgets/snackber_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../models/counsellor.dart';
@@ -36,13 +37,7 @@ class CounsellorController extends GetxController {
       counsellors.value = fetched;
       filteredCounsellors.value = List.from(counsellors);
     } catch (e) {
-      Get.snackbar(
-        'Error',
-        'Failed to load counsellors',
-        backgroundColor: const Color(0xFFE53935),
-        colorText: const Color(0xFFFEFEFE),
-        snackPosition: SnackPosition.TOP,
-      );
+      safeSnackbar('Error', 'Failed to load counsellors', backgroundColor: const Color(0xFFE53935), colorText: const Color(0xFFFEFEFE), snackPosition: SnackPosition.TOP);
     } finally {
       isLoading.value = false;
     }
@@ -86,22 +81,9 @@ class CounsellorController extends GetxController {
       if (created != null) {
         counsellors.add(created);
         filteredCounsellors.value = List.from(counsellors);
-        Get.snackbar(
-          'Success',
-          'Counsellor added successfully!',
-          backgroundColor: const Color(0xFF4CAF50),
-          colorText: const Color(0xFFFEFEFE),
-          snackPosition: SnackPosition.TOP,
-        );
       }
     } catch (e) {
-      Get.snackbar(
-        'Error',
-        'Failed to add counsellor',
-        backgroundColor: const Color(0xFFE53935),
-        colorText: const Color(0xFFFEFEFE),
-        snackPosition: SnackPosition.TOP,
-      );
+      safeSnackbar('Error', 'Failed to add counsellor', backgroundColor: const Color(0xFFE53935), colorText: const Color(0xFFFEFEFE), snackPosition: SnackPosition.TOP);
     } finally {
       isCreating.value = false;
     }
@@ -127,23 +109,9 @@ class CounsellorController extends GetxController {
       if (index != -1) {
         counsellors[index] = updated;
         filteredCounsellors.value = List.from(counsellors);
-
-        Get.snackbar(
-          'Success',
-          'Counsellor updated successfully!',
-          backgroundColor: const Color(0xFF4CAF50),
-          colorText: const Color(0xFFFEFEFE),
-          snackPosition: SnackPosition.TOP,
-        );
       }
     } catch (e) {
-      Get.snackbar(
-        'Error',
-        'Failed to update counsellor',
-        backgroundColor: const Color(0xFFE53935),
-        colorText: const Color(0xFFFEFEFE),
-        snackPosition: SnackPosition.TOP,
-      );
+      safeSnackbar('Error', 'Failed to update counsellor', backgroundColor: const Color(0xFFE53935), colorText: const Color(0xFFFEFEFE), snackPosition: SnackPosition.TOP);
     } finally {
       isCreating.value = false;
     }
@@ -156,21 +124,8 @@ class CounsellorController extends GetxController {
       await service.deleteCounsellor(id);
       counsellors.removeWhere((c) => c.id == id);
       filteredCounsellors.value = List.from(counsellors);
-      Get.snackbar(
-        'Success',
-        'Counsellor deleted successfully!',
-        backgroundColor: const Color(0xFF4CAF50),
-        colorText: const Color(0xFFFEFEFE),
-        snackPosition: SnackPosition.TOP,
-      );
     } catch (e) {
-      Get.snackbar(
-        'Error',
-        'Failed to delete counsellor',
-        backgroundColor: const Color(0xFFE53935),
-        colorText: const Color(0xFFFEFEFE),
-        snackPosition: SnackPosition.TOP,
-      );
+      safeSnackbar('Error', 'Failed to delete counsellor', backgroundColor: const Color(0xFFE53935), colorText: const Color(0xFFFEFEFE), snackPosition: SnackPosition.TOP);
     }
   }
 

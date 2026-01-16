@@ -1,3 +1,4 @@
+import 'package:application_admin_panel/widgets/snackber_helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -49,15 +50,8 @@ class StudentController extends GetxController {
       );
       students.add(created);
       filteredStudents.value = List.from(students);
-      Get.snackbar(
-        'Success',
-        'Student onboarded successfully!',
-        backgroundColor: const Color(0xFF4CAF50),
-        colorText: const Color(0xFFFEFEFE),
-        snackPosition: SnackPosition.TOP,
-      );
     } catch (e) {
-      Get.snackbar(
+      safeSnackbar(
         'Error',
         'Failed to onboard student',
         backgroundColor: const Color(0xFFE53935),
@@ -90,16 +84,9 @@ class StudentController extends GetxController {
       if (index != -1) {
         students[index] = edited;
         filteredStudents.value = List.from(students);
-        Get.snackbar(
-          'Success',
-          'Student updated successfully!',
-          backgroundColor: const Color(0xFF4CAF50),
-          colorText: const Color(0xFFFEFEFE),
-          snackPosition: SnackPosition.TOP,
-        );
       }
     } catch (e) {
-      Get.snackbar(
+      safeSnackbar(
         'Error',
         'Failed to update student',
         backgroundColor: const Color(0xFFE53935),
@@ -117,15 +104,8 @@ class StudentController extends GetxController {
       await _studentServices.deleteStudent(studentId);
       students.removeWhere((s) => s.studentId == studentId);
       filteredStudents.value = List.from(students);
-      Get.snackbar(
-        'Success',
-        'Student deleted successfully!',
-        backgroundColor: const Color(0xFF4CAF50),
-        colorText: const Color(0xFFFEFEFE),
-        snackPosition: SnackPosition.TOP,
-      );
     } catch (e) {
-      Get.snackbar(
+      safeSnackbar(
         'Error',
         'Failed to delete student',
         backgroundColor: const Color(0xFFE53935),

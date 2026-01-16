@@ -1,3 +1,4 @@
+import 'package:application_admin_panel/widgets/snackber_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:typed_data';
@@ -151,7 +152,7 @@ class _OnboardEditTeacherCardState extends State<OnboardEditTeacherCard> {
         });
       }
     } catch (e) {
-      Get.snackbar(
+      safeSnackbar(
         'Error',
         'Failed to pick profile photo: $e',
         backgroundColor: AppColors.errorRed,

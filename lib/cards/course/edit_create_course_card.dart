@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:application_admin_panel/widgets/snackber_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:get/get.dart';
@@ -183,7 +184,7 @@ class _EditCreateCourseCardState extends State<EditCreateCourseCard> {
         });
       }
     } catch (e) {
-      Get.snackbar(
+      safeSnackbar(
         'Error',
         'Failed to pick course photo: $e',
         backgroundColor: AppColors.errorRed,
@@ -213,7 +214,7 @@ class _EditCreateCourseCardState extends State<EditCreateCourseCard> {
         });
       }
     } catch (e) {
-      Get.snackbar(
+      safeSnackbar(
         'Error',
         'Failed to pick course video: $e',
         backgroundColor: AppColors.errorRed,

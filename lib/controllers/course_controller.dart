@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:application_admin_panel/widgets/snackber_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../models/course.dart';
@@ -35,17 +36,8 @@ class CourseController extends GetxController {
 
       courses.value = fetchedCourses;
       filteredCourses.value = List.from(courses);
-
-      Get.snackbar(
-        'Success',
-        'Courses loaded successfully!',
-        backgroundColor: const Color(0xFF4CAF50),
-        colorText: const Color(0xFFFEFEFE),
-        snackPosition: SnackPosition.TOP,
-        duration: const Duration(seconds: 2),
-      );
     } catch (e) {
-      Get.snackbar(
+      safeSnackbar(
         'Error',
         'Failed to load courses: ${e.toString()}',
         backgroundColor: const Color(0xFFE53935),
@@ -79,15 +71,8 @@ class CourseController extends GetxController {
         videoName: videoName,
       );
       await getAllCourses();
-      Get.snackbar(
-        'Success',
-        'Course added successfully!',
-        backgroundColor: const Color(0xFF4CAF50),
-        colorText: const Color(0xFFFEFEFE),
-        snackPosition: SnackPosition.TOP,
-      );
     } catch (e) {
-      Get.snackbar(
+      safeSnackbar(
         'Error',
         'Failed to add course: ${e.toString()}',
         backgroundColor: const Color(0xFFE53935),
@@ -123,15 +108,8 @@ class CourseController extends GetxController {
         videoName: videoName,
       );
       await getAllCourses();
-      Get.snackbar(
-        'Success',
-        'Course updated successfully!',
-        backgroundColor: const Color(0xFF4CAF50),
-        colorText: const Color(0xFFFEFEFE),
-        snackPosition: SnackPosition.TOP,
-      );
     } catch (e) {
-      Get.snackbar(
+      safeSnackbar(
         'Error',
         'Failed to update course: ${e.toString()}',
         backgroundColor: const Color(0xFFE53935),
@@ -149,15 +127,8 @@ class CourseController extends GetxController {
       await CourseServices.deleteCourse(courseCode);
       courses.removeWhere((c) => c.code == courseCode);
       filteredCourses.value = List.from(courses);
-      Get.snackbar(
-        'Success',
-        'Course deleted successfully!',
-        backgroundColor: const Color(0xFF4CAF50),
-        colorText: const Color(0xFFFEFEFE),
-        snackPosition: SnackPosition.TOP,
-      );
     } catch (e) {
-      Get.snackbar(
+      safeSnackbar(
         'Error',
         'Failed to delete course: ${e.toString()}',
         backgroundColor: const Color(0xFFE53935),

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../widgets/snackber_helper.dart';
 import '../models/teacher.dart';
 import '../models/course.dart';
 import '../services/teacher_services.dart';
@@ -12,15 +13,8 @@ class TeacherController extends GetxController {
     try {
       await TeacherServices.deleteTeacher(id);
       await fetchTeachers();
-      Get.snackbar(
-        'Success',
-        'Teacher deleted successfully!',
-        backgroundColor: const Color(0xFF4CAF50),
-        colorText: const Color(0xFFFEFEFE),
-        snackPosition: SnackPosition.TOP,
-      );
     } catch (e) {
-      Get.snackbar(
+      safeSnackbar(
         'Error',
         'Failed to delete teacher',
         backgroundColor: const Color(0xFFE53935),
@@ -43,7 +37,7 @@ class TeacherController extends GetxController {
       if (kDebugMode) {
         print('Error fetching courses: $e');
       }
-      Get.snackbar(
+      safeSnackbar(
         'Error',
         'Failed to fetch courses',
         backgroundColor: const Color(0xFFE53935),
@@ -116,15 +110,8 @@ class TeacherController extends GetxController {
         profilePhotoFilename: profilePhotoFilename,
       );
       await fetchTeachers();
-      Get.snackbar(
-        'Success',
-        'Teacher onboarded successfully!',
-        backgroundColor: const Color(0xFF4CAF50),
-        colorText: const Color(0xFFFEFEFE),
-        snackPosition: SnackPosition.TOP,
-      );
     } catch (e) {
-      Get.snackbar(
+      safeSnackbar(
         'Error',
         'Failed to onboard teacher',
         backgroundColor: const Color(0xFFE53935),
@@ -159,15 +146,8 @@ class TeacherController extends GetxController {
         profilePhotoFilename: profilePhotoFilename,
       );
       await fetchTeachers();
-      Get.snackbar(
-        'Success',
-        'Teacher updated successfully!',
-        backgroundColor: const Color(0xFF4CAF50),
-        colorText: const Color(0xFFFEFEFE),
-        snackPosition: SnackPosition.TOP,
-      );
     } catch (e) {
-      Get.snackbar(
+      safeSnackbar(
         'Error',
         'Failed to update teacher',
         backgroundColor: const Color(0xFFE53935),
@@ -190,7 +170,7 @@ class TeacherController extends GetxController {
       if (kDebugMode) {
         print('Error fetching teachers: $e');
       }
-      Get.snackbar(
+      safeSnackbar(
         'Error',
         'Failed to fetch teachers',
         backgroundColor: const Color(0xFFE53935),

@@ -1,3 +1,4 @@
+import 'package:application_admin_panel/widgets/snackber_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../theme/app_theme.dart';
@@ -277,7 +278,7 @@ class _CourseCardState extends State<CourseCard> {
                         mode: LaunchMode.externalApplication,
                       );
                     } else {
-                      Get.snackbar(
+                      safeSnackbar(
                         'Error',
                         'Could not open video URL',
                         backgroundColor: AppColors.errorRed,

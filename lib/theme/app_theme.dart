@@ -159,7 +159,7 @@ class AppTheme {
     bool large = false,
   }) {
     return ElevatedButton.styleFrom(
-      minimumSize: Size(double.infinity, buttonHeight(context, large: large)),
+      minimumSize: Size(0, buttonHeight(context, large: large)),
       backgroundColor: AppColors.darkRed,
       foregroundColor: AppColors.white,
       elevation: 4,
@@ -177,7 +177,7 @@ class AppTheme {
     bool large = false,
   }) {
     return OutlinedButton.styleFrom(
-      minimumSize: Size(double.infinity, buttonHeight(context, large: large)),
+      minimumSize: Size(0, buttonHeight(context, large: large)),
       backgroundColor: AppColors.white,
       foregroundColor: AppColors.darkRed,
       side: BorderSide(color: AppColors.darkRed, width: 1.5),

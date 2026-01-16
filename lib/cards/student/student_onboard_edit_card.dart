@@ -1,4 +1,5 @@
 import 'package:application_admin_panel/services/course_services.dart';
+import 'package:application_admin_panel/widgets/snackber_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:get/get.dart';
@@ -718,7 +719,7 @@ class _StudentOnboardEditCardState extends State<StudentOnboardEditCard> {
 
   void _saveStudent(StudentController controller, bool isEditing) async {
     if (!_formKey.currentState!.validate()) {
-      Get.snackbar(
+      safeSnackbar(
         'Validation Error',
         'Please fill all required fields',
         backgroundColor: AppColors.errorRed,
@@ -729,7 +730,7 @@ class _StudentOnboardEditCardState extends State<StudentOnboardEditCard> {
     }
 
     if (_enrollmentDate == null) {
-      Get.snackbar(
+      safeSnackbar(
         'Validation Error',
         'Please select an enrollment date',
         backgroundColor: AppColors.errorRed,

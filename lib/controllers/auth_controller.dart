@@ -1,3 +1,4 @@
+import 'package:application_admin_panel/widgets/snackber_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../models/admin.dart';
@@ -30,7 +31,7 @@ class AuthController extends GetxController {
   Future<void> login() async {
     // Validate inputs
     if (emailController.text.trim().isEmpty) {
-      Get.snackbar(
+      safeSnackbar(
         'Error',
         'Please enter your email',
         backgroundColor: const Color(0xFFE53935),
@@ -41,7 +42,7 @@ class AuthController extends GetxController {
       return;
     }
     if (passwordController.text.isEmpty) {
-      Get.snackbar(
+      safeSnackbar(
         'Error',
         'Please enter your password',
         backgroundColor: const Color(0xFFE53935),
@@ -58,17 +59,10 @@ class AuthController extends GetxController {
         password: passwordController.text,
       );
       currentAdmin.value = admin;
-      Get.snackbar(
-        'Success',
-        'Welcome back, ${admin.name.isNotEmpty ? admin.name : admin.email}!',
-        backgroundColor: const Color(0xFF4CAF50),
-        colorText: const Color(0xFFFEFEFE),
-        snackPosition: SnackPosition.TOP,
-        margin: const EdgeInsets.all(16),
-      );
+
       Get.offAllNamed(AppRoutes.dashboard);
     } catch (e) {
-      Get.snackbar(
+      safeSnackbar(
         'Error',
         e.toString().replaceAll('Exception: ', ''),
         backgroundColor: const Color(0xFFE53935),
@@ -84,7 +78,7 @@ class AuthController extends GetxController {
   // Forgot password
   Future<void> forgotPassword() async {
     if (emailController.text.trim().isEmpty) {
-      Get.snackbar(
+      safeSnackbar(
         'Info',
         'Please enter your email first',
         backgroundColor: const Color(0xFFFFA726),
@@ -95,9 +89,9 @@ class AuthController extends GetxController {
       return;
     }
 
-    Get.snackbar(
-      'Password Reset',
-      'Reset link sent to ${emailController.text.trim()}',
+    safeSnackbar(
+      'Oops!',
+      'Contact support to reset your password.',
       backgroundColor: const Color(0xFF1E88E5),
       colorText: const Color(0xFFFEFEFE),
       snackPosition: SnackPosition.TOP,
