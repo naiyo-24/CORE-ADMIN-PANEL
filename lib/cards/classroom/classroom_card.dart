@@ -68,16 +68,6 @@ class ClassroomCard extends StatelessWidget {
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      ElevatedButton.icon(
-                        style: AppTheme.primaryButtonStyle(
-                          context,
-                          large: false,
-                        ),
-                        onPressed: () => onEdit(classroom),
-                        icon: const Icon(Icons.edit, size: 16),
-                        label: const Text('Edit'),
-                      ),
-                      const SizedBox(width: 8),
                       OutlinedButton.icon(
                         onPressed: () => onDelete(classroom),
                         icon: const Icon(Icons.delete, size: 16),
